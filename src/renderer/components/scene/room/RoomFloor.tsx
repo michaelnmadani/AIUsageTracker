@@ -42,8 +42,22 @@ export const RoomFloor: React.FC = () => (
       <ellipse key={`knot-${i}`} cx={k.x} cy={k.y} rx="2.5" ry="1.8" fill="#8a6830" opacity="0.2" />
     ))}
 
+    {/* Extra wood grain curves for realism */}
+    {[
+      { x: 80, y: 70, rx: 8, ry: 2 }, { x: 250, y: 90, rx: 6, ry: 1.5 },
+      { x: 320, y: 180, rx: 10, ry: 2.5 }, { x: 120, y: 200, rx: 7, ry: 1.8 },
+      { x: 180, y: 48, rx: 5, ry: 1.2 }, { x: 350, y: 60, rx: 6, ry: 1.5 },
+    ].map((g, i) => (
+      <ellipse key={`grain-${i}`} cx={g.x} cy={g.y} rx={g.rx} ry={g.ry}
+        fill="none" stroke="#8a6830" strokeWidth="0.3" opacity="0.15" />
+    ))}
+
     {/* Worn/scuffed area near center (under table) */}
     <ellipse cx="200" cy="130" rx="50" ry="30" fill="#a88040" opacity="0.08" />
+    {/* Worn area near kitchen */}
+    <ellipse cx="60" cy="75" rx="20" ry="12" fill="#a88040" opacity="0.05" />
+    {/* Worn area near door */}
+    <ellipse cx="200" cy="215" rx="25" ry="10" fill="#9a7838" opacity="0.06" />
 
     {/* === Large Decorative Rug (center) === */}
     <rect x="130" y="95" width="140" height="80" rx="3" fill="url(#rugPattern)" />

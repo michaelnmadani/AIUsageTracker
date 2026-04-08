@@ -69,5 +69,25 @@ export const RoomDefs: React.FC = () => (
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
+
+    {/* Warm lamp light (pooled) */}
+    <radialGradient id="lampPool" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stopColor="#ffe8a0" stopOpacity="0.18" />
+      <stop offset="60%" stopColor="#ffcc66" stopOpacity="0.06" />
+      <stop offset="100%" stopColor="#ffcc66" stopOpacity="0" />
+    </radialGradient>
+
+    {/* Table cloth pattern */}
+    <pattern id="clothCheck" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#e8d8c0" />
+      <rect width="3" height="3" fill="#dcc8a8" />
+      <rect x="3" y="3" width="3" height="3" fill="#dcc8a8" />
+    </pattern>
+
+    {/* Window curtain gradient */}
+    <linearGradient id="curtainFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stopColor="#c08060" stopOpacity="0.7" />
+      <stop offset="100%" stopColor="#c08060" stopOpacity="0.3" />
+    </linearGradient>
   </defs>
 );

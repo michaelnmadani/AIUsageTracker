@@ -37,14 +37,29 @@ export const RoomFurniture: React.FC = () => (
     <rect x="34" y="30" width="45" height="18" rx="1" fill="#a08050" stroke="#7a5a30" strokeWidth="1" filter="url(#shadow)" />
     {/* Bottles on counter */}
     {[38, 44, 50, 56, 62, 68].map((x, i) => (
-      <rect key={`kb-${i}`} x={x} y={32 + (i % 2)} width="3" height="6" rx="0.5"
-        fill={['#558844', '#884422', '#446688', '#aa6633', '#668844', '#884466'][i]}
-        stroke="#333" strokeWidth="0.3" />
+      <g key={`kb-${i}`}>
+        <rect x={x} y={32 + (i % 2)} width="3" height="6" rx="0.5"
+          fill={['#558844', '#884422', '#446688', '#aa6633', '#668844', '#884466'][i]}
+          stroke="#333" strokeWidth="0.3" />
+        {/* Bottle label */}
+        <rect x={x + 0.5} y={34 + (i % 2)} width="2" height="2" rx="0.2" fill="white" opacity="0.2" />
+      </g>
     ))}
+    {/* Hanging pots/pans above counter */}
+    <circle cx="48" cy="28" r="4" fill="none" stroke="#6a6a6a" strokeWidth="1" />
+    <circle cx="58" cy="27" r="3.5" fill="none" stroke="#5a5a5a" strokeWidth="1" />
+    <line x1="48" y1="25" x2="48" y2="24" stroke="#888" strokeWidth="0.5" />
+    <line x1="58" y1="25" x2="58" y2="23.5" stroke="#888" strokeWidth="0.5" />
     {/* Cutting board */}
     <rect x="40" y="52" width="14" height="10" rx="1" fill="#c4a060" stroke="#a08040" strokeWidth="0.5" />
     <ellipse cx="47" cy="55" rx="3" ry="2" fill="#dd6644" opacity="0.5" /> {/* tomato */}
     <rect x="43" y="58" width="8" height="1" fill="#88aa44" /> {/* herbs */}
+    {/* Stack of dishes near kitchen */}
+    <g>
+      <ellipse cx="82" cy="52" rx="5" ry="3" fill="#e8ddd0" stroke="#c8bdb0" strokeWidth="0.4" />
+      <ellipse cx="82" cy="51" rx="4.5" ry="2.8" fill="#e4d8c8" stroke="#c8bdb0" strokeWidth="0.3" />
+      <ellipse cx="82" cy="50" rx="4" ry="2.5" fill="#e0d4c4" stroke="#c8bdb0" strokeWidth="0.3" />
+    </g>
 
     {/* Cauldron/stove */}
     <circle cx="60" cy="75" r="14" fill="#4a4a4a" stroke="#3a3a3a" strokeWidth="1.5" filter="url(#shadow)" />
@@ -64,6 +79,8 @@ export const RoomFurniture: React.FC = () => (
 
     {/* ===== CENTRAL DINING TABLE ===== */}
     <ellipse cx="200" cy="135" rx="45" ry="25" fill="#b89060" stroke="#8a6840" strokeWidth="1.5" filter="url(#shadow)" />
+    {/* Table cloth (half covering) */}
+    <ellipse cx="200" cy="132" rx="35" ry="18" fill="url(#clothCheck)" stroke="#c4b090" strokeWidth="0.5" opacity="0.6" />
     {/* Table grain lines */}
     <ellipse cx="200" cy="135" rx="40" ry="21" fill="none" stroke="#9a7040" strokeWidth="0.4" opacity="0.3" />
     <ellipse cx="200" cy="135" rx="30" ry="15" fill="none" stroke="#9a7040" strokeWidth="0.3" opacity="0.2" />
@@ -71,13 +88,22 @@ export const RoomFurniture: React.FC = () => (
     <ellipse cx="185" cy="128" rx="6" ry="4" fill="#e8ddd0" stroke="#c8bdb0" strokeWidth="0.4" /> {/* plate */}
     <ellipse cx="185" cy="127" rx="3.5" ry="2" fill="#d4a060" opacity="0.5" /> {/* food */}
     <ellipse cx="215" cy="130" rx="5" ry="3.5" fill="#e8ddd0" stroke="#c8bdb0" strokeWidth="0.4" /> {/* plate2 */}
+    <ellipse cx="215" cy="129" rx="3" ry="2" fill="#cc6644" opacity="0.4" /> {/* food on plate2 */}
     <ellipse cx="195" cy="140" rx="5" ry="3" fill="#d4a060" stroke="#b88040" strokeWidth="0.4" /> {/* bread */}
+    <ellipse cx="195" cy="139" rx="2.5" ry="1.5" fill="#e8c080" opacity="0.4" /> {/* bread highlight */}
     <rect x="207" y="126" width="4" height="5" rx="0.8" fill="#c8b090" stroke="#a89070" strokeWidth="0.3" /> {/* mug */}
     <rect x="178" y="138" width="4" height="5" rx="0.8" fill="#c8b090" stroke="#a89070" strokeWidth="0.3" /> {/* mug2 */}
+    {/* Flower vase on table */}
+    <rect x="220" y="136" width="4" height="7" rx="1" fill="#88aacc" stroke="#6088aa" strokeWidth="0.4" />
+    <line x1="222" y1="136" x2="222" y2="130" stroke="#5a8a3a" strokeWidth="0.8" />
+    <circle cx="220" cy="129" r="2" fill="#e888aa" opacity="0.7" />
+    <circle cx="224" cy="130" r="1.8" fill="#e8aa88" opacity="0.6" />
     {/* Candle holder (center) */}
     <circle cx="200" cy="135" r="3" fill="#c4a060" stroke="#a08040" strokeWidth="0.5" />
     <circle cx="200" cy="135" r="1.2" fill="#ffdd66" />
     <circle cx="200" cy="135" r="4" fill="#ffdd44" opacity="0.15" className={styles.lanternFlicker} />
+    {/* Table warm glow from candle */}
+    <circle cx="200" cy="135" r="20" fill="url(#lampPool)" />
     {/* Stools */}
     {[
       { x: 200, y: 108 }, { x: 200, y: 162 },

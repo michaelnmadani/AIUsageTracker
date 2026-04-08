@@ -8,19 +8,45 @@ export const RoomDecor: React.FC = () => (
   <g>
     {/* ===== WALL-MOUNTED ITEMS ===== */}
 
-    {/* Picture frame (back wall left) */}
-    <rect x="130" y="14" width="12" height="10" fill="#c4a060" stroke="#8a6a3a" strokeWidth="0.8" />
-    <rect x="132" y="16" width="8" height="6" fill="#446688" opacity="0.5" /> {/* painting */}
+    {/* Cat portrait frame (back wall left) */}
+    <rect x="128" y="12" width="14" height="12" rx="1" fill="#c4a060" stroke="#8a6a3a" strokeWidth="1" />
+    <rect x="130" y="14" width="10" height="8" fill="#e8d8c0" /> {/* canvas */}
+    {/* Mini cat face in portrait */}
+    <circle cx="135" cy="17" r="2.5" fill="#f0dcc8" />
+    <circle cx="134" cy="16.5" r="0.5" fill="#3a2a1a" />
+    <circle cx="136" cy="16.5" r="0.5" fill="#3a2a1a" />
+    <polygon points="133,14.5 132,12.5 134,14" fill="#f0dcc8" />
+    <polygon points="137,14.5 138,12.5 136,14" fill="#f0dcc8" />
+
+    {/* Second picture frame */}
+    <rect x="108" y="15" width="10" height="8" rx="0.5" fill="#8a6a3a" stroke="#6a4a2a" strokeWidth="0.6" />
+    <rect x="109.5" y="16.5" width="7" height="5" fill="#aaddaa" opacity="0.4" /> {/* landscape painting */}
+    <rect x="109.5" y="19" width="7" height="2.5" fill="#88aa44" opacity="0.3" /> {/* grass */}
 
     {/* Clock (back wall right) */}
-    <circle cx="260" cy="20" r="5" fill="#f0e4c8" stroke="#8a6a3a" strokeWidth="0.8" />
-    <line x1="260" y1="20" x2="260" y2="16.5" stroke="#4a3a2a" strokeWidth="0.5" /> {/* hour hand */}
-    <line x1="260" y1="20" x2="263" y2="20" stroke="#4a3a2a" strokeWidth="0.4" /> {/* minute hand */}
+    <circle cx="260" cy="20" r="6" fill="#f0e4c8" stroke="#8a6a3a" strokeWidth="1" />
+    <circle cx="260" cy="20" r="5" fill="#f8f0e0" />
+    {/* Clock hour marks */}
+    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
+      <line key={`cm-${i}`}
+        x1={260 + 3.8 * Math.cos(deg * Math.PI / 180)} y1={20 + 3.8 * Math.sin(deg * Math.PI / 180)}
+        x2={260 + 4.5 * Math.cos(deg * Math.PI / 180)} y2={20 + 4.5 * Math.sin(deg * Math.PI / 180)}
+        stroke="#6a5a4a" strokeWidth="0.4" />
+    ))}
+    <line x1="260" y1="20" x2="260" y2="16" stroke="#4a3a2a" strokeWidth="0.6" /> {/* hour hand */}
+    <line x1="260" y1="20" x2="263.5" y2="20" stroke="#4a3a2a" strokeWidth="0.4" /> {/* minute hand */}
     <circle cx="260" cy="20" r="0.8" fill="#4a3a2a" />
 
     {/* Mounted fish trophy (left wall) */}
     <ellipse cx="26" cy="100" rx="4" ry="8" fill="#6a9ab8" stroke="#4a7a98" strokeWidth="0.5" transform="rotate(-15, 26, 100)" />
     <path d="M 26 92 L 24 88 L 28 88 Z" fill="#6a9ab8" transform="rotate(-15, 26, 100)" /> {/* tail */}
+    {/* Plaque under fish */}
+    <rect x="22" y="108" width="8" height="3" rx="0.5" fill="#8a6a3a" stroke="#6a4a2a" strokeWidth="0.3" />
+
+    {/* Shelf with trinkets (right wall) */}
+    <rect x="360" y="80" width="10" height="2" fill="#8a6a3a" stroke="#6a4a2a" strokeWidth="0.3" />
+    <circle cx="363" cy="79" r="1.5" fill="#cc8844" /> {/* small jar */}
+    <rect x="366" y="77" width="2" height="3" rx="0.3" fill="#88aacc" stroke="#6088aa" strokeWidth="0.2" /> {/* tiny vase */}
 
     {/* Hanging herbs (from ceiling, left area) */}
     {[85, 95, 105].map((x) => (
@@ -117,7 +143,27 @@ export const RoomDecor: React.FC = () => (
       <circle cx="320" cy="160" r="0.5" fill="#ffdd88" opacity="0.2" />
     </g>
 
+    {/* ===== WARM LIGHT POOLS ===== */}
+    {/* Light pool from left wall sconce */}
+    <circle cx="45" cy="65" r="20" fill="url(#lampPool)" />
+    {/* Light pool from right wall sconce */}
+    <circle cx="355" cy="145" r="20" fill="url(#lampPool)" />
+    {/* Fireplace warm glow on floor */}
+    <ellipse cx="200" cy="70" rx="35" ry="15" fill="url(#lampPool)" opacity="0.8" />
+
+    {/* ===== EXTRA FLOOR ITEMS ===== */}
+    {/* Small cushion near bookshelf */}
+    <ellipse cx="340" cy="155" rx="6" ry="4" fill="#c87880" stroke="#a86068" strokeWidth="0.5" />
+    <ellipse cx="340" cy="154" rx="5" ry="3" fill="#d88890" opacity="0.6" />
+
+    {/* Scattered acorn/nut */}
+    <circle cx="130" cy="170" r="1.5" fill="#a08040" stroke="#806020" strokeWidth="0.3" />
+    <circle cx="135" cy="172" r="1.2" fill="#b09050" stroke="#806020" strokeWidth="0.3" />
+
+    {/* Small rug at kitchen area */}
+    <rect x="42" y="85" width="25" height="15" rx="2" fill="#8a7a5a" stroke="#6a5a3a" strokeWidth="0.5" opacity="0.5" />
+
     {/* Warm ambient overlay */}
-    <rect x="30" y="25" width="340" height="200" fill="#ffaa44" opacity="0.02" />
+    <rect x="30" y="25" width="340" height="200" fill="#ffaa44" opacity="0.03" />
   </g>
 );

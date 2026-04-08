@@ -1,5 +1,6 @@
 import React from 'react';
 import { House } from './House';
+import { CatDefs } from './CatDefs';
 import { CookingCat } from './CookingCat';
 import { ReadingCat } from './ReadingCat';
 import { SweepingCat } from './SweepingCat';
@@ -17,12 +18,12 @@ interface CatHouseSceneProps {
 }
 
 const CAT_POSITIONS: Record<string, { x: number; y: number; scale: number }> = {
-  cooking:   { x: 40,  y: 30,  scale: 0.50 },
-  typing:    { x: 280, y: 25,  scale: 0.48 },
-  reading:   { x: 270, y: 100, scale: 0.50 },
-  sweeping:  { x: 150, y: 100, scale: 0.48 },
-  sleeping:  { x: 280, y: 170, scale: 0.45 },
-  gardening: { x: 40,  y: 170, scale: 0.50 },
+  cooking:   { x: 40,  y: 30,  scale: 0.55 },
+  typing:    { x: 275, y: 25,  scale: 0.53 },
+  reading:   { x: 265, y: 100, scale: 0.55 },
+  sweeping:  { x: 150, y: 100, scale: 0.53 },
+  sleeping:  { x: 275, y: 170, scale: 0.50 },
+  gardening: { x: 40,  y: 170, scale: 0.55 },
 };
 
 const CatComponent: Record<CatActivity, React.FC<{ x?: number; y?: number }>> = {
@@ -59,6 +60,8 @@ export const CatHouseScene: React.FC<CatHouseSceneProps> = ({ activities, isActi
 
         {/* Room interior */}
         <House />
+        {/* Shared cat SVG definitions */}
+        <CatDefs />
 
         {/* Render cats with walking animation wrappers */}
         {uniqueActivities.map((activity) => {
