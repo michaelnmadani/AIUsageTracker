@@ -76,16 +76,14 @@ export const CatHouseScene: React.FC<CatHouseSceneProps> = ({ activities, isActi
         {/* House background elements */}
         <House />
 
-        {/* Render active cats */}
+        {/* Render active cats - wrap in positioning group so CSS animations don't override position */}
         {uniqueActivities.map((activity) => {
           const Component = CatComponent[activity];
           const pos = CAT_POSITIONS[activity];
           return (
-            <Component
-              key={activity}
-              x={pos.x}
-              y={pos.y}
-            />
+            <g key={activity} transform={`translate(${pos.x}, ${pos.y})`}>
+              <Component x={0} y={0} />
+            </g>
           );
         })}
 
