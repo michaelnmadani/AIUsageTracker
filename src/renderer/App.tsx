@@ -7,7 +7,7 @@ import { useSoundEffects } from './hooks/useSoundEffects';
 
 export const App: React.FC = () => {
   const { current, history, projects, models, loading } = useUsageData();
-  const { status, catActivities, isActive } = useClaudeStatus(current);
+  const { status, catActivities, isActive, celebrating } = useClaudeStatus(current);
   const { muted, volume, setVolume, toggleMute } = useSoundEffects(status);
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
 
@@ -187,7 +187,7 @@ export const App: React.FC = () => {
 
       {/* Cat scene (top ~55%) */}
       <div style={{ height: '55%', flexShrink: 0, overflow: 'hidden' }}>
-        <CatHouseScene activities={catActivities} isActive={isActive} />
+        <CatHouseScene activities={catActivities} isActive={isActive} celebrating={celebrating} />
       </div>
 
       {/* Dashboard (bottom ~45%) */}

@@ -76,13 +76,7 @@ export const CookingCat: React.FC<CookingCatProps> = ({ x = 0, y = 0 }) => {
         opacity="0.3"
       />
 
-      {/* Level badge */}
-      <g transform="translate(42, 72)">
-        <rect x="-12" y="-8" width="24" height="14" rx="3" fill="#fff8e1" stroke="#c4a882" strokeWidth="0.8" />
-        <text x="0" y="3" textAnchor="middle" fontSize="7" fill="#6d4c2a" fontWeight="bold">
-          LV.1
-        </text>
-      </g>
+
     </g>
   );
 };

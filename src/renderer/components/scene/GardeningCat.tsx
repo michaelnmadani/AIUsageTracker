@@ -94,13 +94,7 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
       <path d="M 10 72 Q 2 64, 5 55" fill="none" stroke="#f5f0e8" strokeWidth="3.5" strokeLinecap="round" />
       <path d="M 10 72 Q 2 64, 5 55" fill="none" stroke="#8d6e63" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
 
-      {/* Level badge */}
-      <g transform="translate(52, 25)">
-        <rect x="-14" y="-8" width="28" height="14" rx="3" fill="#fff8e1" stroke="#c4a882" strokeWidth="0.8" />
-        <text x="0" y="3" textAnchor="middle" fontSize="6" fill="#6d4c2a" fontWeight="bold">
-          LV.701
-        </text>
-      </g>
+
     </g>
   );
 };
