@@ -16,11 +16,11 @@
 }
 
 .sceneActive {
-  filter: brightness(1.1) saturate(1.1);
+  filter: brightness(1.05) saturate(1.15) sepia(0.05);
 }
 
 .sceneIdle {
-  filter: brightness(0.85) saturate(0.9);
+  filter: brightness(0.75) saturate(0.85) sepia(0.1);
 }
 
 /* ========================================

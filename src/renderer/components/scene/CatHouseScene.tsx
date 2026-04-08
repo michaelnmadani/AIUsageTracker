@@ -14,13 +14,13 @@ interface CatHouseSceneProps {
   isActive: boolean;
 }
 
-const CAT_POSITIONS = {
-  cooking: { x: 30, y: 95 },
-  reading: { x: 260, y: 90 },
-  sweeping: { x: 150, y: 88 },
-  sleeping: { x: 90, y: 105 },
-  typing: { x: 170, y: 85 },
-  gardening: { x: 310, y: 90 },
+const CAT_POSITIONS: Record<string, { x: number; y: number; scale: number }> = {
+  cooking: { x: 82, y: 100, scale: 0.55 },
+  reading: { x: 232, y: 92, scale: 0.55 },
+  sweeping: { x: 160, y: 112, scale: 0.52 },
+  sleeping: { x: 278, y: 128, scale: 0.48 },
+  typing: { x: 62, y: 68, scale: 0.48 },
+  gardening: { x: 2, y: 148, scale: 0.55 },
 };
 
 const CatComponent: Record<CatActivity, React.FC<{ x?: number; y?: number }>> = {
@@ -45,43 +45,47 @@ export const CatHouseScene: React.FC<CatHouseSceneProps> = ({ activities, isActi
         preserveAspectRatio="xMidYMid meet"
         className={styles.sceneSvg}
       >
-        {/* Background gradient */}
+        {/* Warm twilight background gradient */}
         <defs>
           <linearGradient id="bgGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a1a2e" />
-            <stop offset="40%" stopColor="#16213e" />
-            <stop offset="100%" stopColor="#1b3a1b" />
+            <stop offset="0%" stopColor="#c4956a" />
+            <stop offset="30%" stopColor="#8faa6e" />
+            <stop offset="60%" stopColor="#6b8e4e" />
+            <stop offset="100%" stopColor="#4a6e34" />
           </linearGradient>
         </defs>
         <rect width="400" height="250" fill="url(#bgGradient)" />
 
-        {/* Stars (when idle/night feel) */}
-        <g className={styles.stars} opacity={isActive ? 0.2 : 0.6}>
-          <circle cx="30" cy="20" r="1" fill="white" />
-          <circle cx="80" cy="35" r="0.5" fill="white" />
-          <circle cx="150" cy="15" r="0.8" fill="white" />
-          <circle cx="220" cy="28" r="0.6" fill="white" />
-          <circle cx="290" cy="10" r="1" fill="white" />
-          <circle cx="340" cy="40" r="0.5" fill="white" />
-          <circle cx="380" cy="18" r="0.7" fill="white" />
-          <circle cx="120" cy="45" r="0.4" fill="white" />
-          <circle cx="270" cy="50" r="0.6" fill="white" />
-          <circle cx="60" cy="55" r="0.5" fill="white" />
+        {/* Soft clouds */}
+        <g opacity={isActive ? 0.35 : 0.25}>
+          <ellipse cx="60" cy="25" rx="30" ry="8" fill="#e8d8c0" />
+          <ellipse cx="45" cy="22" rx="18" ry="7" fill="#e8d8c0" />
+          <ellipse cx="320" cy="18" rx="25" ry="6" fill="#e8d8c0" />
+          <ellipse cx="340" cy="15" rx="15" ry="5" fill="#e8d8c0" />
+          <ellipse cx="200" cy="12" rx="20" ry="5" fill="#e8d8c0" />
         </g>
 
-        {/* Moon */}
-        <circle cx="350" cy="35" r="15" fill="#fff9c4" opacity="0.3" />
-        <circle cx="355" cy="32" r="13" fill="url(#bgGradient)" />
+        {/* Warm sun glow (top right) */}
+        <circle cx="370" cy="20" r="20" fill="#f5c842" opacity="0.15" />
+        <circle cx="370" cy="20" r="12" fill="#f5d062" opacity="0.25" />
+
+        {/* Distant trees / hills */}
+        <g opacity="0.4">
+          <ellipse cx="15" cy="130" rx="20" ry="18" fill="#4a7030" />
+          <ellipse cx="385" cy="128" rx="18" ry="16" fill="#4a7030" />
+          <ellipse cx="395" cy="135" rx="12" ry="10" fill="#5a8040" />
+          <ellipse cx="5" cy="135" rx="14" ry="12" fill="#5a8040" />
+        </g>
 
         {/* House background elements */}
         <House />
 
-        {/* Render active cats - wrap in positioning group so CSS animations don't override position */}
+        {/* Render active cats - positioned inside the tavern with scaling */}
         {uniqueActivities.map((activity) => {
           const Component = CatComponent[activity];
           const pos = CAT_POSITIONS[activity];
           return (
-            <g key={activity} transform={`translate(${pos.x}, ${pos.y})`}>
+            <g key={activity} transform={`translate(${pos.x}, ${pos.y}) scale(${pos.scale})`}>
               <Component x={0} y={0} />
             </g>
           );
