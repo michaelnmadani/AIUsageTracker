@@ -7,117 +7,123 @@ interface SweepingCatProps {
 }
 
 /**
- * Anime-style orange tabby cat with red bandana and apron, sweeping.
- * Shown when Claude is editing/cleaning code.
+ * Anime-style orange tabby with red bandana and apron, sweeping.
  */
 export const SweepingCat: React.FC<SweepingCatProps> = ({ x = 0, y = 0 }) => {
   return (
     <g transform={`translate(${x}, ${y})`} className={styles.sweepingCat}>
       {/* Ground shadow */}
-      <ellipse cx="28" cy="82" rx="20" ry="4" fill="#3a2a1a" opacity="0.18" />
+      <ellipse cx="26" cy="96" rx="20" ry="4" fill="#3a2a1a" opacity="0.18" />
 
       {/* Dust particles */}
       <g className={styles.dustParticles}>
-        <circle cx="52" cy="72" r="1.2" fill="#d4c4a4" opacity="0.5" />
-        <circle cx="57" cy="67" r="1.5" fill="#d4c4a4" opacity="0.4" />
-        <circle cx="49" cy="64" r="1" fill="#d4c4a4" opacity="0.55" />
-        <circle cx="55" cy="75" r="1.2" fill="#d4c4a4" opacity="0.3" />
+        <circle cx="54" cy="78" r="1.2" fill="#d4c4a4" opacity="0.5" />
+        <circle cx="59" cy="72" r="1.5" fill="#d4c4a4" opacity="0.4" />
+        <circle cx="51" cy="68" r="1" fill="#d4c4a4" opacity="0.55" />
+        <circle cx="57" cy="82" r="1.2" fill="#d4c4a4" opacity="0.3" />
       </g>
 
       {/* Broom */}
       <g className={styles.sweepMotion}>
-        <line x1="40" y1="38" x2="54" y2="72" stroke="#8d6e50" strokeWidth="2.5" strokeLinecap="round" />
-        {/* Broom bristles - detailed fan shape */}
-        <path d="M 48 68 Q 54 66, 60 70 Q 58 78, 48 76 Z" fill="#d4a060" stroke="#b08040" strokeWidth="0.8" />
-        <line x1="50" y1="69" x2="49" y2="75" stroke="#c09040" strokeWidth="0.5" />
-        <line x1="52" y1="68" x2="52" y2="76" stroke="#c09040" strokeWidth="0.5" />
-        <line x1="54" y1="68" x2="55" y2="76" stroke="#c09040" strokeWidth="0.5" />
-        <line x1="56" y1="69" x2="57" y2="75" stroke="#c09040" strokeWidth="0.5" />
-        {/* Broom binding */}
-        <rect x="48" y="67" width="10" height="2" rx="0.5" fill="#6d5030" stroke="#5a4020" strokeWidth="0.3" />
+        <line x1="42" y1="42" x2="56" y2="80" stroke="#8d6e50" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 50 76 Q 56 74, 62 78 Q 60 86, 50 84 Z" fill="#d4a060" stroke="#b08040" strokeWidth="0.8" />
+        <line x1="52" y1="77" x2="51" y2="83" stroke="#c09040" strokeWidth="0.5" />
+        <line x1="54" y1="76" x2="54" y2="84" stroke="#c09040" strokeWidth="0.5" />
+        <line x1="56" y1="76" x2="57" y2="84" stroke="#c09040" strokeWidth="0.5" />
+        <line x1="58" y1="77" x2="59" y2="83" stroke="#c09040" strokeWidth="0.5" />
+        <rect x="50" y="75" width="10" height="2" rx="0.5" fill="#6d5030" stroke="#5a4020" strokeWidth="0.3" />
       </g>
 
-      {/* Tail (behind body) */}
-      <path d="M 10 74 Q 2 60, 6 48 Q 8 42, 12 40" fill="none" stroke="url(#furOrange)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M 10 74 Q 2 60, 6 48 Q 8 42, 12 40" fill="none" stroke="#a06820" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
+      {/* Tail */}
+      <path d="M 8 82 Q 0 66, 5 52 Q 7 44, 12 42" fill="none" stroke="url(#furOrange)" strokeWidth="6" strokeLinecap="round" />
+      <path d="M 8 82 Q 0 66, 5 52 Q 7 44, 12 42" fill="none" stroke="#a06820" strokeWidth="0.8" strokeLinecap="round" opacity="0.2" />
       {/* Tail stripes */}
-      <path d="M 5 58 Q 7 56, 9 58" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.4" />
-      <path d="M 4 52 Q 6 50, 8 52" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.4" />
+      <path d="M 4 62 Q 6 60, 8 62" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.35" />
+      <path d="M 3 55 Q 5 53, 7 55" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.35" />
 
-      {/* Body with apron */}
-      <ellipse cx="25" cy="66" rx="14" ry="13" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
+      {/* Legs */}
+      <path d="M 16 78 L 15 88 Q 15 92, 12 92 L 12 93 Q 12 95, 18 95 Q 20 95, 20 92 L 20 88 L 19 78" fill="url(#furOrange)" stroke="#a06820" strokeWidth="0.7" />
+      <path d="M 26 78 L 25 88 Q 25 92, 22 92 L 22 93 Q 22 95, 28 95 Q 30 95, 30 92 L 30 88 L 29 78" fill="url(#furOrange)" stroke="#a06820" strokeWidth="0.7" />
+      {/* Boots */}
+      <ellipse cx="16" cy="94" rx="5" ry="2.5" fill="#8b4513" stroke="#6d3410" strokeWidth="0.5" />
+      <ellipse cx="28" cy="94" rx="5" ry="2.5" fill="#8b4513" stroke="#6d3410" strokeWidth="0.5" />
+      {/* Boot tops */}
+      <rect x="13" y="86" width="6" height="6" rx="2" fill="white" stroke="#e0d0c0" strokeWidth="0.3" />
+      <rect x="23" y="86" width="6" height="6" rx="2" fill="white" stroke="#e0d0c0" strokeWidth="0.3" />
+
+      {/* Body */}
+      <path d="M 9 52 Q 7 58, 8 68 Q 9 78, 13 80 Q 22 84, 31 80 Q 35 78, 36 68 Q 37 58, 35 52 Q 29 48, 22 48 Q 15 48, 9 52 Z" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
       {/* Tabby stripes on body */}
-      <path d="M 16 58 Q 25 56, 34 58" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.35" />
-      <path d="M 15 63 Q 25 61, 35 63" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.35" />
-      <path d="M 16 68 Q 25 66, 34 68" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.35" />
+      <path d="M 13 56 Q 22 54, 31 56" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.3" />
+      <path d="M 12 62 Q 22 60, 32 62" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.3" />
+      <path d="M 13 68 Q 22 66, 31 68" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.3" />
+      {/* Body shading */}
+      <path d="M 9 52 Q 7 58, 8 68 Q 9 74, 11 78 Q 12 68, 12 56 Q 13 50, 9 52" fill="#a06820" opacity="0.06" />
       {/* Apron */}
-      <path d="M 15 57 Q 25 54, 35 57 L 36 78 Q 25 82, 14 78 Z" fill="#fff8f2" stroke="#e0d0c0" strokeWidth="0.7" opacity="0.9" />
-      {/* Apron pocket */}
-      <rect x="20" y="64" width="10" height="7" rx="1.5" fill="#fff0e8" stroke="#e0c8b8" strokeWidth="0.4" />
-      {/* Apron frill */}
-      <path d="M 14 76 Q 17 74, 20 76 Q 23 74, 26 76 Q 29 74, 32 76 Q 35 74, 36 76" fill="none" stroke="#e0d0c0" strokeWidth="0.7" />
+      <path d="M 13 55 Q 22 52, 31 55 L 33 80 Q 22 84, 11 80 Z" fill="#fff8f2" stroke="#e0d0c0" strokeWidth="0.7" opacity="0.9" />
+      <rect x="18" y="64" width="10" height="7" rx="1.5" fill="#fff0e8" stroke="#e0c8b8" strokeWidth="0.4" />
+      <path d="M 11 78 Q 14 76, 17 78 Q 20 76, 23 78 Q 26 76, 29 78 Q 32 76, 33 78" fill="none" stroke="#e0d0c0" strokeWidth="0.7" />
 
-      {/* Head (chibi) */}
-      <circle cx="25" cy="38" r="16" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
-      {/* Tabby M marking on forehead */}
-      <path d="M 17 28 L 21 24 L 25 28 L 29 24 L 33 28" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.45" />
-      {/* Cheek fur tufts */}
-      <path d="M 10 38 Q 8 36, 10 34" fill="none" stroke="#d89040" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
-      <path d="M 40 38 Q 42 36, 40 34" fill="none" stroke="#d89040" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+      {/* Head */}
+      <circle cx="22" cy="36" r="17" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
+      {/* Tabby M on forehead */}
+      <path d="M 14 26 L 18 22 L 22 26 L 26 22 L 30 26" fill="none" stroke="#c47020" strokeWidth="1.2" opacity="0.4" />
+      {/* Head shading */}
+      <path d="M 7 30 Q 5 36, 7 42 Q 10 38, 10 32 Q 8 28, 7 30" fill="#a06820" opacity="0.06" />
+      {/* Cheek fur */}
+      <path d="M 6 36 Q 3 32, 6 28" fill="none" stroke="#d89040" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <path d="M 38 36 Q 41 32, 38 28" fill="none" stroke="#d89040" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
 
       {/* Ears */}
-      <polygon points="13,26 7,8 21,22" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
-      <polygon points="14,24 10,14 19,23" fill="#f0b8a0" opacity="0.5" />
-      <path d="M 10 14 Q 12 11, 11 9" fill="none" stroke="#d89040" strokeWidth="0.8" strokeLinecap="round" />
-      <polygon points="37,26 43,8 29,22" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
-      <polygon points="36,24 40,14 31,23" fill="#f0b8a0" opacity="0.5" />
-      <path d="M 40 14 Q 38 11, 39 9" fill="none" stroke="#d89040" strokeWidth="0.8" strokeLinecap="round" />
+      <path d="M 10,26 Q 6,14 4,6 Q 8,12 18,22" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
+      <path d="M 12,24 Q 9,16 8,10 Q 10,14 17,22" fill="#f0b8a0" opacity="0.45" />
+      <path d="M 7 10 Q 9 7, 8 5" fill="none" stroke="#d89040" strokeWidth="0.8" strokeLinecap="round" />
+      <path d="M 34,26 Q 38,14 40,6 Q 36,12 26,22" fill="url(#furOrange)" stroke="#a06820" strokeWidth="1" />
+      <path d="M 32,24 Q 35,16 36,10 Q 34,14 27,22" fill="#f0b8a0" opacity="0.45" />
+      <path d="M 37 10 Q 35 7, 36 5" fill="none" stroke="#d89040" strokeWidth="0.8" strokeLinecap="round" />
 
-      {/* Bandana - red with pattern */}
-      <path d="M 13 30 Q 25 32, 37 30" fill="none" stroke="#cc3333" strokeWidth="2.5" strokeLinecap="round" />
-      <polygon points="36,30 42,38 39,40" fill="#cc3333" opacity="0.85" />
-      <polygon points="37,31 41,37 39,38" fill="#dd5555" opacity="0.4" />
-      {/* Bandana dots */}
-      <circle cx="20" cy="30.5" r="0.8" fill="#ff8888" opacity="0.5" />
-      <circle cx="25" cy="31" r="0.8" fill="#ff8888" opacity="0.5" />
-      <circle cx="30" cy="30.5" r="0.8" fill="#ff8888" opacity="0.5" />
+      {/* Bandana */}
+      <path d="M 10 28 Q 22 30, 34 28" fill="none" stroke="#cc3333" strokeWidth="3" strokeLinecap="round" />
+      <polygon points="33,28 40,38 37,40" fill="#cc3333" opacity="0.85" />
+      <polygon points="34,29 39,36 37,38" fill="#dd5555" opacity="0.4" />
+      <circle cx="18" cy="29" r="0.8" fill="#ff8888" opacity="0.5" />
+      <circle cx="22" cy="29.5" r="0.8" fill="#ff8888" opacity="0.5" />
+      <circle cx="27" cy="29" r="0.8" fill="#ff8888" opacity="0.5" />
 
-      {/* Eyes - determined anime style */}
-      <ellipse cx="19" cy="37" rx="3.2" ry="3.8" fill="white" stroke="#8a6840" strokeWidth="0.5" />
-      <ellipse cx="19" cy="38" rx="2.5" ry="3" fill="url(#irisAmber)" />
-      <ellipse cx="19" cy="38.5" rx="1.6" ry="2" fill="#3a2a1a" />
-      <circle cx="17.8" cy="36.5" r="1.1" fill="white" opacity="0.9" />
-      <circle cx="20" cy="38.5" r="0.5" fill="white" opacity="0.5" />
-      {/* Slight eyebrow angle (determined) */}
-      <path d="M 16 33.5 Q 18 32.5, 21 34" fill="none" stroke="#a06820" strokeWidth="0.7" />
+      {/* Eyes - determined */}
+      <ellipse cx="16" cy="35" rx="3.5" ry="4.2" fill="white" stroke="#8a6840" strokeWidth="0.5" />
+      <ellipse cx="16" cy="36" rx="2.8" ry="3.3" fill="url(#irisAmber)" />
+      <ellipse cx="16" cy="36.5" rx="1.8" ry="2.2" fill="#3a2a1a" />
+      <circle cx="14.5" cy="34.5" r="1.3" fill="white" opacity="0.9" />
+      <circle cx="17.5" cy="37" r="0.6" fill="white" opacity="0.5" />
+      <path d="M 12.5 31 Q 14.5 30, 17 31.5" fill="none" stroke="#a06820" strokeWidth="1.1" strokeLinecap="round" />
 
-      <ellipse cx="31" cy="37" rx="3.2" ry="3.8" fill="white" stroke="#8a6840" strokeWidth="0.5" />
-      <ellipse cx="31" cy="38" rx="2.5" ry="3" fill="url(#irisAmber)" />
-      <ellipse cx="31" cy="38.5" rx="1.6" ry="2" fill="#3a2a1a" />
-      <circle cx="29.8" cy="36.5" r="1.1" fill="white" opacity="0.9" />
-      <circle cx="32" cy="38.5" r="0.5" fill="white" opacity="0.5" />
-      <path d="M 29 34 Q 32 32.5, 34 33.5" fill="none" stroke="#a06820" strokeWidth="0.7" />
+      <ellipse cx="28" cy="35" rx="3.5" ry="4.2" fill="white" stroke="#8a6840" strokeWidth="0.5" />
+      <ellipse cx="28" cy="36" rx="2.8" ry="3.3" fill="url(#irisAmber)" />
+      <ellipse cx="28" cy="36.5" rx="1.8" ry="2.2" fill="#3a2a1a" />
+      <circle cx="26.5" cy="34.5" r="1.3" fill="white" opacity="0.9" />
+      <circle cx="29.5" cy="37" r="0.6" fill="white" opacity="0.5" />
+      <path d="M 26 31.5 Q 28.5 30, 31.5 31" fill="none" stroke="#a06820" strokeWidth="1.1" strokeLinecap="round" />
 
-      {/* Blush marks */}
-      <ellipse cx="14" cy="42" rx="3" ry="1.8" fill="url(#blushMark)" />
-      <ellipse cx="36" cy="42" rx="3" ry="1.8" fill="url(#blushMark)" />
+      {/* Blush */}
+      <ellipse cx="11" cy="40" rx="3.5" ry="2" fill="url(#blushMark)" />
+      <ellipse cx="33" cy="40" rx="3.5" ry="2" fill="url(#blushMark)" />
 
       {/* Nose & mouth */}
-      <path d="M 24 43 L 25 41.5 L 26 43 Z" fill="#e8a898" />
-      <path d="M 22 44 Q 25 46, 28 44" fill="none" stroke="#8d6e63" strokeWidth="0.6" />
+      <path d="M 21 42 L 22 40.5 L 23 42 Z" fill="#e8a898" />
+      <path d="M 19 43 Q 22 45, 25 43" fill="none" stroke="#8d6e63" strokeWidth="0.6" />
 
       {/* Whiskers */}
-      <line x1="6" y1="40" x2="15" y2="41" stroke="#c4a060" strokeWidth="0.4" opacity="0.35" />
-      <line x1="5" y1="43" x2="15" y2="42.5" stroke="#c4a060" strokeWidth="0.4" opacity="0.35" />
-      <line x1="35" y1="41" x2="44" y2="40" stroke="#c4a060" strokeWidth="0.4" opacity="0.35" />
-      <line x1="35" y1="42.5" x2="45" y2="43" stroke="#c4a060" strokeWidth="0.4" opacity="0.35" />
+      <line x1="4" y1="39" x2="13" y2="40" stroke="#c4a060" strokeWidth="0.4" opacity="0.3" />
+      <line x1="3" y1="42" x2="13" y2="41.5" stroke="#c4a060" strokeWidth="0.4" opacity="0.3" />
+      <line x1="31" y1="40" x2="40" y2="39" stroke="#c4a060" strokeWidth="0.4" opacity="0.3" />
+      <line x1="31" y1="41.5" x2="41" y2="42" stroke="#c4a060" strokeWidth="0.4" opacity="0.3" />
 
       {/* Paw holding broom */}
-      <ellipse cx="38" cy="50" rx="5" ry="3.5" fill="url(#furOrange)" stroke="#a06820" strokeWidth="0.8" />
-      <circle cx="36.5" cy="49" r="0.7" fill="#e8b0a0" opacity="0.5" />
-      <circle cx="38.5" cy="48.5" r="0.7" fill="#e8b0a0" opacity="0.5" />
-      {/* Other paw */}
-      <ellipse cx="26" cy="76" rx="5" ry="3" fill="url(#furOrange)" stroke="#a06820" strokeWidth="0.8" />
+      <ellipse cx="40" cy="52" rx="5.5" ry="4" fill="url(#furOrange)" stroke="#a06820" strokeWidth="0.8" />
+      <circle cx="38" cy="51" r="0.8" fill="#e8b0a0" opacity="0.5" />
+      <circle cx="40" cy="50.5" r="0.8" fill="#e8b0a0" opacity="0.5" />
+      <circle cx="42" cy="51" r="0.8" fill="#e8b0a0" opacity="0.5" />
     </g>
   );
 };
