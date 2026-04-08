@@ -1,0 +1,16 @@
+appId: com.aiusagetracker.app
+productName: AI Usage Tracker
+directories:
+  output: out
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - src/sounds/**/*
+mac:
+  target:
+    - dmg
+    - zip
+  icon: build/icon.icns
+  category: public.app-category.developer-tools
+dmg:
+  title: AI Usage Tracker
