@@ -94,6 +94,16 @@ function setupIPC() {
     return parser.getModelBreakdown();
   });
 
+  ipcMain.handle('usage:refresh', async () => {
+    parser.parseAll();
+    return {
+      current: parser.getCurrentSession(),
+      history: parser.getHistoricalUsage(),
+      projects: parser.getProjects(),
+      models: parser.getModelBreakdown(),
+    };
+  });
+
   ipcMain.handle('window:toggle-always-on-top', async () => {
     const isOnTop = mainWindow?.isAlwaysOnTop();
     mainWindow?.setAlwaysOnTop(!isOnTop);
@@ -113,17 +123,36 @@ function startWatching() {
   const homedir = require('os').homedir();
   const claudeDir = path.join(homedir, '.claude');
 
+  console.log('[AIUsageTracker] Home directory:', homedir);
+  console.log('[AIUsageTracker] Watching Claude dir:', claudeDir);
+
+  const fs = require('fs');
+  if (fs.existsSync(claudeDir)) {
+    console.log('[AIUsageTracker] Claude directory exists');
+    try {
+      const contents = fs.readdirSync(claudeDir);
+      console.log('[AIUsageTracker] Contents:', contents);
+    } catch (e: any) {
+      console.error('[AIUsageTracker] Cannot read claude dir:', e.message);
+    }
+  } else {
+    console.warn('[AIUsageTracker] Claude directory NOT found at:', claudeDir);
+  }
+
   watcher = new ClaudeWatcher(claudeDir, parser);
 
   watcher.on('usage-update', (data) => {
+    console.log('[AIUsageTracker] Usage update - projects:', data.projects?.length, 'models:', data.models?.length);
     mainWindow?.webContents.send('usage:update', data);
   });
 
   watcher.on('status-change', (status) => {
+    console.log('[AIUsageTracker] Status change:', status);
     mainWindow?.webContents.send('usage:status-change', status);
   });
 
   watcher.start();
+  console.log('[AIUsageTracker] Watcher started');
 }
 
 app.whenReady().then(() => {

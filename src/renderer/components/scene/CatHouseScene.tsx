@@ -15,12 +15,12 @@ interface CatHouseSceneProps {
 }
 
 const CAT_POSITIONS = {
-  cooking: { x: 80, y: 95 },
-  reading: { x: 180, y: 100 },
-  sweeping: { x: 130, y: 95 },
-  sleeping: { x: 170, y: 108 },
-  typing: { x: 230, y: 95 },
-  gardening: { x: 300, y: 98 },
+  cooking: { x: 30, y: 95 },
+  reading: { x: 260, y: 90 },
+  sweeping: { x: 150, y: 88 },
+  sleeping: { x: 90, y: 105 },
+  typing: { x: 170, y: 85 },
+  gardening: { x: 310, y: 90 },
 };
 
 const CatComponent: Record<CatActivity, React.FC<{ x?: number; y?: number }>> = {

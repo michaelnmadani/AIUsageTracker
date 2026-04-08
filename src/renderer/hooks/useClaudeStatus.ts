@@ -26,24 +26,21 @@ export function useClaudeStatus(current: CurrentSessionInfo) {
   // Determine what cats should be doing based on recent activity
   const catActivities = useMemo((): CatActivity[] => {
     if (status === 'idle' || status === 'offline') {
-      return ['sleeping', 'reading', 'gardening'];
+      // Show a peaceful scene with multiple cats
+      return ['sleeping', 'reading', 'gardening', 'cooking'];
     }
 
-    // When active, show a mix of busy cats
-    const activities: CatActivity[] = ['gardening']; // gardening cat is always present
-
+    // When active, show ALL busy cats for a lively scene
     const recentEntries = current.recentEntries || [];
     const hasToolUse = recentEntries.some(
       (e) => e.type === 'assistant'
     );
 
     if (hasToolUse) {
-      activities.push('typing', 'cooking', 'sweeping');
+      return ['typing', 'cooking', 'sweeping', 'gardening'];
     } else {
-      activities.push('reading', 'cooking', 'typing');
+      return ['reading', 'cooking', 'typing', 'gardening'];
     }
-
-    return activities;
   }, [status, current.recentEntries]);
 
   return {

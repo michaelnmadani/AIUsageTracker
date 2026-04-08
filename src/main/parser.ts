@@ -76,9 +76,12 @@ function getModelDisplay(model: string): { name: string; color: string } {
 }
 
 function decodeProjectPath(encoded: string): string {
-  // -home-user-MyProject -> MyProject
-  const parts = encoded.replace(/^-/, '').split('-');
-  return parts[parts.length - 1] || encoded;
+  // Encoded path: -Users-john-Projects-MyApp or -home-user-MyProject
+  // We want the last meaningful path segment as the project name
+  // Replace the encoded path separator back to real path, then take basename
+  const decoded = encoded.replace(/^-/, '/').replace(/-/g, '/');
+  const basename = decoded.split('/').filter(Boolean).pop();
+  return basename || encoded;
 }
 
 export class UsageParser {
@@ -92,8 +95,11 @@ export class UsageParser {
   }
 
   parseAll(): void {
+    console.log('[Parser] Parsing all data from:', this.claudeDir);
     this.parseSessions();
+    console.log('[Parser] Found', this.sessions.size, 'sessions');
     this.parseTranscripts();
+    console.log('[Parser] Found', this.allEntries.length, 'usage entries');
     this.lastParseTime = Date.now();
   }
 
