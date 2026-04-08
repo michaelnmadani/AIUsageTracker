@@ -29,10 +29,14 @@ function createWindow() {
     visualEffectState: 'active',
   });
 
-  if (process.env.NODE_ENV === 'development' || process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173');
+  if (process.env.VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
+    // In production, __dirname is inside the asar: app.asar/dist-electron/main/
+    // The renderer dist is at app.asar/dist/index.html
+    const indexPath = path.join(__dirname, '../../dist/index.html');
+    console.log('[AIUsageTracker] Loading:', indexPath);
+    mainWindow.loadFile(indexPath);
   }
 
   mainWindow.on('closed', () => {

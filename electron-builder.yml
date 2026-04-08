@@ -2,15 +2,27 @@ appId: com.aiusagetracker.app
 productName: AI Usage Tracker
 directories:
   output: out
+  buildResources: build
 files:
   - dist/**/*
   - dist-electron/**/*
   - src/sounds/**/*
+  - "!node_modules/**/*.ts"
+  - "!node_modules/**/*.map"
 mac:
   target:
-    - dmg
-    - zip
-  icon: build/icon.icns
+    - target: dmg
+      arch:
+        - universal
   category: public.app-category.developer-tools
+  artifactName: "${productName}-${version}.${ext}"
 dmg:
   title: AI Usage Tracker
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+asar: true

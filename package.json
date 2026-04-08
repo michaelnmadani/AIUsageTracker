@@ -5,9 +5,11 @@
   "main": "dist-electron/main/index.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "build:vite": "tsc && vite build",
+    "build": "vite build && electron-builder --mac",
+    "build:dir": "vite build && electron-builder --mac --dir",
+    "build:vite": "vite build",
     "preview": "vite preview",
+    "start": "electron .",
     "electron:dev": "vite build && electron ."
   },
   "dependencies": {
