@@ -25,6 +25,8 @@ export const CurrentSession: React.FC<CurrentSessionProps> = ({ current, status 
     return entries.slice(-10).map((e) => e.usage.inputTokens + e.usage.outputTokens);
   }, [current.recentEntries]);
 
+  const hasData = current.totalInputTokens > 0 || current.totalOutputTokens > 0 || current.sessionId;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       {/* Status bar */}
@@ -39,8 +41,8 @@ export const CurrentSession: React.FC<CurrentSessionProps> = ({ current, status 
         <ModelBadge model={current.model} />
       </div>
 
-      {/* Project name */}
-      {current.projectName && (
+      {/* Project name or waiting message */}
+      {current.projectName ? (
         <div
           style={{
             fontSize: '12px',
@@ -53,7 +55,25 @@ export const CurrentSession: React.FC<CurrentSessionProps> = ({ current, status 
         >
           {current.projectName}
         </div>
-      )}
+      ) : !hasData ? (
+        <div
+          style={{
+            fontSize: '11px',
+            color: '#64748b',
+            padding: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            borderRadius: '8px',
+            textAlign: 'center',
+            lineHeight: 1.5,
+          }}
+        >
+          Waiting for Claude Code activity...
+          <br />
+          <span style={{ fontSize: '10px', color: '#4a5568' }}>
+            Run <code style={{ color: '#f59e0b', fontSize: '10px' }}>claude</code> in your terminal to start tracking
+          </span>
+        </div>
+      ) : null}
 
       {/* Token counters grid */}
       <div

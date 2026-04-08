@@ -99,8 +99,18 @@ export class UsageParser {
     this.parseSessions();
     console.log('[Parser] Found', this.sessions.size, 'sessions');
     this.parseTranscripts();
-    console.log('[Parser] Found', this.allEntries.length, 'usage entries');
+    this.parseRootHistory();
+    console.log('[Parser] Found', this.allEntries.length, 'total usage entries');
     this.lastParseTime = Date.now();
+  }
+
+  private parseRootHistory(): void {
+    // Some Claude versions store history.jsonl at the root level
+    const historyFile = path.join(this.claudeDir, 'history.jsonl');
+    if (fs.existsSync(historyFile)) {
+      console.log('[Parser] Found root history.jsonl');
+      this.parseJsonlFiles(this.claudeDir, 'history');
+    }
   }
 
   private parseSessions(): void {
@@ -174,15 +184,20 @@ export class UsageParser {
   private parseJsonlFiles(dir: string, projectName: string): void {
     try {
       const files = fs.readdirSync(dir).filter((f) => f.endsWith('.jsonl'));
+      console.log('[Parser] Scanning dir:', dir, '- found', files.length, 'JSONL files');
       for (const file of files) {
         const filePath = path.join(dir, file);
         try {
           const content = fs.readFileSync(filePath, 'utf-8');
           const lines = content.split('\n').filter((line) => line.trim());
+          let usageCount = 0;
+          let totalLines = lines.length;
 
           for (const line of lines) {
             try {
               const entry = JSON.parse(line);
+
+              // Handle entries with message.usage (standard Claude Code CLI format)
               if (entry.message?.usage) {
                 const usage = entry.message.usage;
                 this.allEntries.push({
@@ -198,11 +213,32 @@ export class UsageParser {
                   sessionId: entry.sessionId,
                   projectName,
                 });
+                usageCount++;
+              }
+
+              // Also handle entries that have usage at top level (some formats)
+              if (entry.usage && !entry.message?.usage) {
+                const usage = entry.usage;
+                this.allEntries.push({
+                  timestamp: entry.timestamp ? new Date(entry.timestamp).toISOString() : new Date().toISOString(),
+                  model: entry.model || 'unknown',
+                  usage: {
+                    inputTokens: usage.input_tokens || usage.inputTokens || 0,
+                    outputTokens: usage.output_tokens || usage.outputTokens || 0,
+                    cacheCreationTokens: usage.cache_creation_input_tokens || 0,
+                    cacheReadTokens: usage.cache_read_input_tokens || 0,
+                  },
+                  type: entry.type || 'unknown',
+                  sessionId: entry.sessionId,
+                  projectName,
+                });
+                usageCount++;
               }
             } catch {
               // skip malformed lines
             }
           }
+          console.log('[Parser] File:', file, '-', totalLines, 'lines,', usageCount, 'with usage data');
         } catch {
           // skip unreadable files
         }
