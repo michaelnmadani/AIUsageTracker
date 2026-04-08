@@ -25,14 +25,34 @@ export class ClaudeWatcher extends EventEmitter {
     const projectsDir = path.join(this.claudeDir, 'projects');
     const sessionsDir = path.join(this.claudeDir, 'sessions');
 
+    // Also watch Claude Desktop agent mode sessions on macOS
+    const os = require('os');
+    const claudeDesktopAgentDir = path.join(
+      os.homedir(),
+      'Library',
+      'Application Support',
+      'Claude',
+      'local-agent-mode-sessions'
+    );
+
     const watchPaths = [
       `${projectsDir}/**/*.jsonl`,
       `${sessionsDir}/*.json`,
     ];
 
+    // Add Claude Desktop path if it exists
+    const fs = require('fs');
+    if (fs.existsSync(claudeDesktopAgentDir)) {
+      watchPaths.push(`${claudeDesktopAgentDir}/**/*.jsonl`);
+      console.log('[Watcher] Also watching Claude Desktop agent dir:', claudeDesktopAgentDir);
+    }
+
+    console.log('[Watcher] Watching paths:', watchPaths);
+
     this.watcher = chokidar.watch(watchPaths, {
       persistent: true,
       ignoreInitial: true,
+      followSymlinks: true,
       awaitWriteFinish: {
         stabilityThreshold: 300,
         pollInterval: 100,

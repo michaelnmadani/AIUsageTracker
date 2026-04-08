@@ -86,22 +86,91 @@ function decodeProjectPath(encoded: string): string {
 
 export class UsageParser {
   private claudeDir: string;
+  private claudeDesktopDir: string;
   private allEntries: UsageEntry[] = [];
   private sessions: Map<string, SessionData> = new Map();
   private lastParseTime: number = 0;
 
   constructor() {
     this.claudeDir = path.join(os.homedir(), '.claude');
+    // Claude Desktop stores agent mode data here on macOS
+    this.claudeDesktopDir = path.join(
+      os.homedir(),
+      'Library',
+      'Application Support',
+      'Claude'
+    );
   }
 
   parseAll(): void {
     console.log('[Parser] Parsing all data from:', this.claudeDir);
+    console.log('[Parser] Also scanning Claude Desktop at:', this.claudeDesktopDir);
     this.parseSessions();
     console.log('[Parser] Found', this.sessions.size, 'sessions');
     this.parseTranscripts();
+    this.parseClaudeDesktopSessions();
     this.parseRootHistory();
     console.log('[Parser] Found', this.allEntries.length, 'total usage entries');
     this.lastParseTime = Date.now();
+  }
+
+  private parseClaudeDesktopSessions(): void {
+    const agentDir = path.join(this.claudeDesktopDir, 'local-agent-mode-sessions');
+    if (!fs.existsSync(agentDir)) {
+      console.log('[Parser] No Claude Desktop agent sessions directory found');
+      return;
+    }
+
+    console.log('[Parser] Scanning Claude Desktop agent sessions...');
+
+    // Recursively find all .jsonl files in the agent sessions directory
+    const jsonlFiles = this.findJsonlFilesRecursive(agentDir);
+    console.log('[Parser] Found', jsonlFiles.length, 'JSONL files in Claude Desktop');
+
+    for (const filePath of jsonlFiles) {
+      // Determine project name from the path
+      // Path structure: .../local-agent-mode-sessions/{org}/{user}/local_{session}/.claude/projects/-sessions-{slug}/{id}.jsonl
+      // Or: .../local-agent-mode-sessions/{org}/{user}/local_{session}/audit.jsonl
+      let projectName = 'Claude Desktop';
+
+      // Try to extract a meaningful name from path
+      const pathParts = filePath.split(path.sep);
+      const sessionsIdx = pathParts.indexOf('local-agent-mode-sessions');
+      if (sessionsIdx >= 0) {
+        // Look for a slug in the path like "-sessions-blissful-eloquent-bell"
+        for (const part of pathParts) {
+          if (part.startsWith('-sessions-')) {
+            projectName = part.replace('-sessions-', '').replace(/-/g, ' ');
+            // Capitalize first letter of each word
+            projectName = projectName.replace(/\b\w/g, (c) => c.toUpperCase());
+            break;
+          }
+        }
+      }
+
+      this.parseJsonlFiles(path.dirname(filePath), projectName);
+    }
+  }
+
+  private findJsonlFilesRecursive(dir: string, maxDepth: number = 10): string[] {
+    const results: string[] = [];
+    if (maxDepth <= 0) return results;
+
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+          results.push(fullPath);
+        } else if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+          results.push(...this.findJsonlFilesRecursive(fullPath, maxDepth - 1));
+        }
+      }
+    } catch {
+      // Permission denied or other error
+    }
+
+    return results;
   }
 
   private parseRootHistory(): void {
