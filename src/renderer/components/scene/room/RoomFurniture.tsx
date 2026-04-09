@@ -22,8 +22,10 @@ export const RoomFurniture: React.FC = () => (
     {/* Logs */}
     <line x1="190" y1="47" x2="210" y2="47" stroke="#6a4a2a" strokeWidth="3" strokeLinecap="round" />
     <line x1="192" y1="50" x2="208" y2="50" stroke="#7a5a3a" strokeWidth="2.5" strokeLinecap="round" />
-    {/* Warm glow on floor */}
-    <circle cx="200" cy="60" r="25" fill="url(#warmGlow)" opacity="0.4" />
+    {/* Warm glow on floor (expanded) */}
+    <circle cx="200" cy="60" r="30" fill="url(#warmGlow)" opacity="0.45" />
+    {/* Orange glow on stone surround */}
+    <rect x="172" y="30" width="56" height="25" fill="#ff8844" opacity="0.04" />
     {/* Mantel shelf */}
     <rect x="170" y="55" width="60" height="3" fill="#8a6a3a" stroke="#6a4a2a" strokeWidth="0.5" />
     {/* Items on mantel */}

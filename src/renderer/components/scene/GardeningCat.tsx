@@ -8,12 +8,14 @@ interface GardeningCatProps {
 
 /**
  * Anime-style calico cat with straw hat and garden apron, watering plants.
+ * Enhanced with cel-shading, ambient occlusion, rim lighting, and volumetric gradients.
  */
 export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
   return (
-    <g transform={`translate(${x}, ${y})`} className={styles.gardeningCat}>
-      {/* Ground shadow */}
-      <ellipse cx="26" cy="96" rx="22" ry="4" fill="#3a2a1a" opacity="0.18" />
+    <g transform={`translate(${x}, ${y})`} className={styles.gardeningCat} filter="url(#catsAndSoupStyle)">
+      {/* Layered ground shadow */}
+      <ellipse cx="26" cy="97" rx="26" ry="5" fill="#3a2a1a" opacity="0.08" />
+      <ellipse cx="26" cy="96" rx="20" ry="3.5" fill="#3a2a1a" opacity="0.2" />
 
       {/* Plant pot with herb bush */}
       <g>
@@ -23,8 +25,13 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
         <ellipse cx="56" cy="35" rx="7" ry="6" fill="#5a9a3a" stroke="#4a7a2a" strokeWidth="0.5" />
         <ellipse cx="50" cy="40" rx="5" ry="4" fill="#6aaa4a" stroke="#4a7a2a" strokeWidth="0.5" />
         <ellipse cx="62" cy="39" rx="5.5" ry="4.5" fill="#7aba5a" stroke="#4a7a2a" strokeWidth="0.5" />
+        {/* Leaf veins */}
         <line x1="56" y1="32" x2="56" y2="38" stroke="#4a8a2a" strokeWidth="0.4" opacity="0.5" />
         <line x1="50" y1="38" x2="50" y2="42" stroke="#4a8a2a" strokeWidth="0.4" opacity="0.5" />
+        <line x1="62" y1="37" x2="62" y2="41" stroke="#4a8a2a" strokeWidth="0.4" opacity="0.4" />
+        {/* Leaf highlights */}
+        <ellipse cx="54" cy="34" rx="2" ry="1.5" fill="#8aca6a" opacity="0.15" />
+        <ellipse cx="63" cy="37" rx="2" ry="1.5" fill="#8aca6a" opacity="0.12" />
       </g>
 
       {/* Flower pot */}
@@ -33,21 +40,30 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
         <ellipse cx="3" cy="72" rx="6" ry="2" fill="#5a4030" />
         <line x1="3" y1="72" x2="3" y2="54" stroke="#5a8a3a" strokeWidth="1.8" />
         <g className={styles.flowerSway}>
+          {/* Petals with individual gradients */}
           <ellipse cx="0" cy="49" rx="2.8" ry="3.5" fill="#f0c060" transform="rotate(-30 0 49)" />
+          <ellipse cx="0" cy="49" rx="1.5" ry="2" fill="#f8d880" opacity="0.3" transform="rotate(-30 0 49)" />
           <ellipse cx="6" cy="49" rx="2.8" ry="3.5" fill="#f0c060" transform="rotate(30 6 49)" />
+          <ellipse cx="6" cy="49" rx="1.5" ry="2" fill="#f8d880" opacity="0.3" transform="rotate(30 6 49)" />
           <ellipse cx="3" cy="46" rx="2.8" ry="3.5" fill="#f0c060" />
+          <ellipse cx="3" cy="46" rx="1.5" ry="2" fill="#f8d880" opacity="0.3" />
           <ellipse cx="0.5" cy="53" rx="2.8" ry="3.5" fill="#f0c060" transform="rotate(20 0.5 53)" />
           <ellipse cx="5.5" cy="53" rx="2.8" ry="3.5" fill="#f0c060" transform="rotate(-20 5.5 53)" />
           <circle cx="3" cy="50" r="2.5" fill="#d48020" />
           <circle cx="2.5" cy="49.5" r="0.8" fill="#e8a040" opacity="0.6" />
         </g>
+        {/* Leaves with veins */}
         <ellipse cx="-1" cy="62" rx="3" ry="1.5" fill="#6aaa4a" transform="rotate(-20 -1 62)" />
+        <line x1="-1" y1="61" x2="-1" y2="63" stroke="#4a8a2a" strokeWidth="0.3" opacity="0.4" transform="rotate(-20 -1 62)" />
         <ellipse cx="7" cy="64" rx="3" ry="1.5" fill="#6aaa4a" transform="rotate(15 7 64)" />
+        <line x1="7" y1="63" x2="7" y2="65" stroke="#4a8a2a" strokeWidth="0.3" opacity="0.4" transform="rotate(15 7 64)" />
       </g>
 
       {/* Watering can */}
       <g className={styles.wateringMotion}>
         <rect x="36" y="50" width="12" height="10" rx="2.5" fill="#8a9aaa" stroke="#6a7a8a" strokeWidth="0.8" />
+        {/* Metallic sheen */}
+        <rect x="38" y="51" width="3" height="8" rx="1" fill="#a0b0c0" opacity="0.15" />
         <path d="M 48 52 L 56 46" stroke="#8a9aaa" strokeWidth="2.5" strokeLinecap="round" />
         <ellipse cx="57" cy="45" rx="3" ry="2" fill="#7a8a9a" stroke="#6a7a8a" strokeWidth="0.4" />
         <path d="M 38 50 Q 36 44, 42 44 Q 48 44, 46 50" fill="none" stroke="#7a8a9a" strokeWidth="1.5" />
@@ -61,16 +77,23 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
       {/* Tail */}
       <path d="M 6 82 Q -2 66, 2 52 Q 4 46, 9 44" fill="none" stroke="url(#furCalico)" strokeWidth="6" strokeLinecap="round" />
       <path d="M 6 82 Q -2 66, 2 52 Q 4 46, 9 44" fill="none" stroke="#a08868" strokeWidth="0.8" strokeLinecap="round" opacity="0.2" />
-      {/* Calico tail patches */}
-      <circle cx="2" cy="60" r="3" fill="#e8a050" opacity="0.35" />
-      <circle cx="5" cy="50" r="2.5" fill="#6d5040" opacity="0.15" />
+      {/* Calico tail patches (softer edges) */}
+      <circle cx="2" cy="60" r="3.5" fill="#e8a050" opacity="0.3" />
+      <circle cx="2" cy="60" r="2" fill="#e8a050" opacity="0.15" />
+      <circle cx="5" cy="50" r="3" fill="#6d5040" opacity="0.12" />
+      <circle cx="5" cy="50" r="1.5" fill="#6d5040" opacity="0.08" />
+      <path d="M 7 43 Q 9 42, 11 43" fill="none" stroke="#fff0e8" strokeWidth="0.4" opacity="0.25" />
 
       {/* Legs */}
       <path d="M 15 78 L 14 88 Q 14 92, 11 92 L 11 93 Q 11 95, 17 95 Q 19 95, 19 92 L 19 88 L 18 78" fill="url(#furCalico)" stroke="#a08868" strokeWidth="0.7" />
       <path d="M 25 78 L 24 88 Q 24 92, 21 92 L 21 93 Q 21 95, 27 95 Q 29 95, 29 92 L 29 88 L 28 78" fill="url(#furCalico)" stroke="#a08868" strokeWidth="0.7" />
-      {/* Shoes - garden clogs */}
+      <path d="M 15 78 L 14 88 Q 14 89, 15 88 L 16 78" fill="#a08868" opacity="0.08" />
+      <path d="M 25 78 L 24 88 Q 24 89, 25 88 L 26 78" fill="#a08868" opacity="0.08" />
+      {/* Shoes */}
       <ellipse cx="15" cy="94" rx="5" ry="2.5" fill="#6a8a4a" stroke="#4a6a2a" strokeWidth="0.5" />
       <ellipse cx="27" cy="94" rx="5" ry="2.5" fill="#6a8a4a" stroke="#4a6a2a" strokeWidth="0.5" />
+      <ellipse cx="14" cy="93.5" rx="2.5" ry="1" fill="#7a9a5a" opacity="0.3" />
+      <ellipse cx="26" cy="93.5" rx="2.5" ry="1" fill="#7a9a5a" opacity="0.3" />
       {/* Socks with lace tops */}
       <rect x="12" y="86" width="6" height="6" rx="2" fill="white" stroke="#e0d0c0" strokeWidth="0.3" />
       <rect x="22" y="86" width="6" height="6" rx="2" fill="white" stroke="#e0d0c0" strokeWidth="0.3" />
@@ -79,12 +102,20 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
 
       {/* Body */}
       <path d="M 8 52 Q 6 58, 7 68 Q 8 78, 12 80 Q 21 84, 30 80 Q 34 78, 35 68 Q 36 58, 34 52 Q 28 48, 21 48 Q 14 48, 8 52 Z" fill="url(#furCalico)" stroke="#a08868" strokeWidth="1" />
-      {/* Calico patches */}
-      <ellipse cx="15" cy="62" rx="6" ry="5" fill="#e8a050" opacity="0.35" />
-      <ellipse cx="28" cy="70" rx="5" ry="4" fill="#6d5040" opacity="0.15" />
-      <path d="M 8 52 Q 6 58, 7 68 Q 8 74, 10 78 Q 12 68, 12 56 Q 12 50, 8 52" fill="#a08868" opacity="0.06" />
+      {/* Calico patches (softer edges with layered opacity) */}
+      <ellipse cx="15" cy="62" rx="6.5" ry="5.5" fill="#e8a050" opacity="0.25" />
+      <ellipse cx="15" cy="62" rx="4" ry="3.5" fill="#e8a050" opacity="0.15" />
+      <ellipse cx="28" cy="70" rx="5.5" ry="4.5" fill="#6d5040" opacity="0.1" />
+      <ellipse cx="28" cy="70" rx="3" ry="2.5" fill="#6d5040" opacity="0.06" />
+      {/* Body shading */}
+      <path d="M 8 52 Q 6 58, 7 68 Q 8 74, 10 78 Q 12 68, 12 56 Q 12 50, 8 52" fill="#a08868" opacity="0.1" />
+      <path d="M 10 54 Q 9 60, 10 68 Q 11 72, 14 74 Q 14 66, 14 58 Q 13 52, 10 54" fill="#a08868" opacity="0.05" />
+      {/* Body highlight */}
+      <path d="M 30 54 Q 34 60, 33 68 Q 32 72, 28 76 Q 30 68, 30 58 Z" fill="#fff8f0" opacity="0.08" />
       {/* Garden apron */}
       <path d="M 12 56 Q 21 53, 30 56 L 32 80 Q 21 84, 10 80 Z" fill="#88b868" stroke="#68a048" strokeWidth="0.7" opacity="0.9" />
+      {/* Apron fabric sheen */}
+      <path d="M 24 58 Q 30 64, 28 76" fill="#a0d080" opacity="0.08" />
       <rect x="17" y="66" width="10" height="7" rx="1.5" fill="#98c878" stroke="#78a858" strokeWidth="0.4" />
       {/* Flower on pocket */}
       <circle cx="22" cy="69" r="2.2" fill="#f0c080" />
@@ -94,12 +125,24 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
       {/* Fold lines */}
       <path d="M 16 58 L 15 74" fill="none" stroke="#68a048" strokeWidth="0.3" opacity="0.4" />
       <path d="M 26 58 L 27 74" fill="none" stroke="#68a048" strokeWidth="0.3" opacity="0.4" />
+      <path d="M 13 62 L 12 72" fill="none" stroke="#68a048" strokeWidth="0.2" opacity="0.25" />
+
+      {/* AO under chin */}
+      <ellipse cx="21" cy="50" rx="10" ry="4" fill="url(#aoUnderChin)" />
 
       {/* Head */}
       <circle cx="21" cy="36" r="17" fill="url(#furCalico)" stroke="#a08868" strokeWidth="1" />
-      <path d="M 13 30 Q 17 27, 21 32 Q 17 34, 13 30" fill="#e8a050" opacity="0.4" />
-      <path d="M 28 34 Q 32 32, 30 28" fill="#6d5040" opacity="0.15" />
-      <path d="M 6 30 Q 4 36, 6 42 Q 8 38, 8 32 Q 7 28, 6 30" fill="#a08868" opacity="0.06" />
+      {/* Calico face patches (softer) */}
+      <path d="M 13 30 Q 17 27, 21 32 Q 17 34, 13 30" fill="#e8a050" opacity="0.35" />
+      <path d="M 13 30 Q 15 28, 18 31" fill="#e8a050" opacity="0.15" />
+      <path d="M 28 34 Q 32 32, 30 28" fill="#6d5040" opacity="0.12" />
+      {/* Head shading */}
+      <path d="M 6 30 Q 4 36, 6 42 Q 8 38, 8 32 Q 7 28, 6 30" fill="#a08868" opacity="0.1" />
+      <path d="M 8 46 Q 21 52, 34 46 Q 30 48, 21 48 Q 12 48, 8 46" fill="#a08868" opacity="0.06" />
+      {/* Forehead specular */}
+      <ellipse cx="19" cy="30" rx="5" ry="3" fill="url(#specHighlight)" />
+      {/* Fur highlights */}
+      <path d="M 14 28 Q 18 26, 22 28" fill="none" stroke="#fff8f0" strokeWidth="0.6" opacity="0.2" />
 
       {/* Hair tufts */}
       <path d="M 13 20 Q 15 14, 18 20 Q 19 13, 21 18 Q 23 13, 25 20 Q 27 14, 29 20" fill="url(#furCalico)" stroke="#a08868" strokeWidth="0.5" />
@@ -107,32 +150,48 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
       {/* Straw hat */}
       <ellipse cx="21" cy="28" rx="17" ry="4.5" fill="#d4b070" stroke="#a08050" strokeWidth="0.8" />
       <ellipse cx="21" cy="26" rx="11" ry="7" fill="#e0c080" stroke="#a08050" strokeWidth="0.8" />
+      {/* Enhanced hat weave */}
+      <path d="M 12 25 Q 16 23, 21 25 Q 26 23, 30 25" fill="none" stroke="#b09050" strokeWidth="0.4" opacity="0.4" />
+      <path d="M 13 23 Q 17 21, 21 23 Q 25 21, 29 23" fill="none" stroke="#b09050" strokeWidth="0.3" opacity="0.3" />
+      <path d="M 15 27 L 15 21" fill="none" stroke="#b09050" strokeWidth="0.3" opacity="0.2" />
+      <path d="M 21 27 L 21 20" fill="none" stroke="#b09050" strokeWidth="0.3" opacity="0.2" />
+      <path d="M 27 27 L 27 21" fill="none" stroke="#b09050" strokeWidth="0.3" opacity="0.2" />
+      {/* Hat highlight */}
+      <ellipse cx="18" cy="23" rx="4" ry="3" fill="#f0d890" opacity="0.12" />
       <ellipse cx="21" cy="28" rx="12" ry="1.8" fill="#e07080" opacity="0.55" />
       {/* Ribbon bow */}
       <path d="M 32 27 Q 36 25, 34 29 Q 32 27, 32 27" fill="#e07080" stroke="#c06070" strokeWidth="0.3" />
       <path d="M 32 27 Q 36 29, 34 25 Q 32 27, 32 27" fill="#d06070" stroke="#c06070" strokeWidth="0.3" />
-      {/* Hat weave */}
-      <path d="M 12 25 Q 16 23, 21 25 Q 26 23, 30 25" fill="none" stroke="#b09050" strokeWidth="0.4" opacity="0.4" />
+      {/* Bow highlight */}
+      <ellipse cx="34" cy="27" rx="1" ry="0.5" fill="#f0a0b0" opacity="0.2" />
 
       {/* Ears */}
       <path d="M 11,28 Q 7,18 5,10 Q 9,16 17,26" fill="url(#furCalico)" stroke="#a08868" strokeWidth="1" />
       <path d="M 12,27 Q 9,20 8,14 Q 10,18 16,26" fill="#f0b8a8" opacity="0.45" />
+      <ellipse cx="13" cy="27" rx="3" ry="2" fill="url(#aoEarBase)" />
       <path d="M 31,28 Q 35,18 37,10 Q 33,16 25,26" fill="url(#furCalico)" stroke="#a08868" strokeWidth="1" />
       <path d="M 30,27 Q 33,20 34,14 Q 32,18 26,26" fill="#f0b8a8" opacity="0.45" />
+      <ellipse cx="29" cy="27" rx="3" ry="2" fill="url(#aoEarBase)" />
 
-      {/* Eyes - cheerful */}
+      {/* Eyes */}
       <ellipse cx="15" cy="36" rx="3.8" ry="4.5" fill="white" stroke="#8a7858" strokeWidth="0.5" />
+      <path d="M 11.2 33 Q 15 32, 18.8 33" fill="#8a7858" opacity="0.06" />
+      <ellipse cx="15" cy="36.5" rx="3.2" ry="3.8" fill="#4080b0" opacity="0.15" />
       <ellipse cx="15" cy="37" rx="3" ry="3.6" fill="url(#irisBlue)" />
       <ellipse cx="15" cy="37.5" rx="2" ry="2.4" fill="#2a3a4a" />
       <circle cx="13.5" cy="35.5" r="1.3" fill="white" opacity="0.9" />
       <circle cx="16.5" cy="38" r="0.6" fill="white" opacity="0.5" />
+      <circle cx="16" cy="39" r="0.3" fill="white" opacity="0.3" />
       <path d="M 11 32 Q 13.5 31, 16 32" fill="none" stroke="#a08868" strokeWidth="1" strokeLinecap="round" />
 
       <ellipse cx="27" cy="36" rx="3.8" ry="4.5" fill="white" stroke="#8a7858" strokeWidth="0.5" />
+      <path d="M 23.2 33 Q 27 32, 30.8 33" fill="#8a7858" opacity="0.06" />
+      <ellipse cx="27" cy="36.5" rx="3.2" ry="3.8" fill="#4080b0" opacity="0.15" />
       <ellipse cx="27" cy="37" rx="3" ry="3.6" fill="url(#irisBlue)" />
       <ellipse cx="27" cy="37.5" rx="2" ry="2.4" fill="#2a3a4a" />
       <circle cx="25.5" cy="35.5" r="1.3" fill="white" opacity="0.9" />
       <circle cx="28.5" cy="38" r="0.6" fill="white" opacity="0.5" />
+      <circle cx="28" cy="39" r="0.3" fill="white" opacity="0.3" />
       <path d="M 24 32 Q 26.5 31, 29 32" fill="none" stroke="#a08868" strokeWidth="1" strokeLinecap="round" />
 
       {/* Blush */}
@@ -149,6 +208,10 @@ export const GardeningCat: React.FC<GardeningCatProps> = ({ x = 0, y = 0 }) => {
       <line x1="2" y1="43" x2="12" y2="42" stroke="#b09878" strokeWidth="0.4" opacity="0.3" />
       <line x1="30" y1="41" x2="39" y2="40" stroke="#b09878" strokeWidth="0.4" opacity="0.3" />
       <line x1="30" y1="42" x2="40" y2="43" stroke="#b09878" strokeWidth="0.4" opacity="0.3" />
+
+      {/* Rim lighting */}
+      <path d="M 36 28 Q 38 34, 36 42" fill="none" stroke="#fff8e0" strokeWidth="0.8" opacity="0.2" />
+      <path d="M 34 52 Q 36 62, 34 72" fill="none" stroke="#fff8e0" strokeWidth="0.6" opacity="0.15" />
 
       {/* Paw reaching for watering can */}
       <ellipse cx="36" cy="58" rx="5.5" ry="3.5" fill="url(#furCalico)" stroke="#a08868" strokeWidth="0.8" />

@@ -89,5 +89,33 @@ export const RoomDefs: React.FC = () => (
       <stop offset="0%" stopColor="#c08060" stopOpacity="0.7" />
       <stop offset="100%" stopColor="#c08060" stopOpacity="0.3" />
     </linearGradient>
+
+    {/* === Enhanced Room Lighting === */}
+
+    {/* Warm ambient overlay for entire room */}
+    <radialGradient id="roomAmbient" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stopColor="#ffcc66" stopOpacity="0.06" />
+      <stop offset="50%" stopColor="#ffaa44" stopOpacity="0.03" />
+      <stop offset="100%" stopColor="#ff8822" stopOpacity="0" />
+    </radialGradient>
+
+    {/* Depth fog gradient for atmospheric perspective */}
+    <linearGradient id="depthFog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#d0c0a0" stopOpacity="0.08" />
+      <stop offset="100%" stopColor="#d0c0a0" stopOpacity="0" />
+    </linearGradient>
+
+    {/* Enhanced window light (warmer) */}
+    <linearGradient id="windowLightWarm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#ffeedd" stopOpacity="0.3" />
+      <stop offset="40%" stopColor="#aaddff" stopOpacity="0.15" />
+      <stop offset="100%" stopColor="#aaddff" stopOpacity="0" />
+    </linearGradient>
+
+    {/* Corner vignette gradient */}
+    <radialGradient id="cornerVignette" cx="50%" cy="50%" r="70%">
+      <stop offset="60%" stopColor="#000000" stopOpacity="0" />
+      <stop offset="100%" stopColor="#000000" stopOpacity="0.06" />
+    </radialGradient>
   </defs>
 );

@@ -250,6 +250,12 @@
 .fireflies circle:nth-child(4) { animation-delay: 0.5s; animation-duration: 4.5s; }
 .fireflies circle:nth-child(5) { animation-delay: 1.5s; animation-duration: 5.5s; }
 .fireflies circle:nth-child(6) { animation-delay: 3s; animation-duration: 3.5s; }
+.fireflies circle:nth-child(7) { animation-delay: 0.8s; animation-duration: 5.2s; }
+.fireflies circle:nth-child(8) { animation-delay: 2.5s; animation-duration: 4.3s; }
+.fireflies circle:nth-child(9) { animation-delay: 1.2s; animation-duration: 5.8s; }
+.fireflies circle:nth-child(10) { animation-delay: 3.5s; animation-duration: 4.8s; }
+.fireflies circle:nth-child(11) { animation-delay: 0.3s; animation-duration: 5.6s; }
+.fireflies circle:nth-child(12) { animation-delay: 2.8s; animation-duration: 4.2s; }
 
 .stars circle {
   animation: twinkle 3s ease-in-out infinite;
@@ -283,6 +289,28 @@
 @keyframes catBob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
+}
+
+/* ========================================
+   Enhanced Visual Effect Animations
+   ======================================== */
+
+.warmPulse {
+  animation: warmPulse 4s ease-in-out infinite;
+}
+
+@keyframes warmPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.specularShimmer {
+  animation: shimmer 5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.35; }
 }
 
 /* ========================================

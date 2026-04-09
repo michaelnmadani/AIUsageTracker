@@ -85,5 +85,14 @@ export const RoomFloor: React.FC = () => (
     <rect x="30" y="25" width="340" height="8" fill="url(#windowLight)" transform="rotate(180, 200, 29)" opacity="0.4" />
     <rect x="30" y="25" width="8" height="200" fill="#5a4030" opacity="0.06" />
     <rect x="362" y="25" width="8" height="200" fill="#5a4030" opacity="0.06" />
+
+    {/* Warm ambient light pool overlay */}
+    <rect x="30" y="25" width="340" height="200" fill="url(#roomAmbient)" />
+
+    {/* Corner vignette for depth */}
+    <rect x="30" y="25" width="340" height="200" fill="url(#cornerVignette)" />
+
+    {/* Depth fog (subtle, near back wall) */}
+    <rect x="30" y="25" width="340" height="40" fill="url(#depthFog)" />
   </g>
 );

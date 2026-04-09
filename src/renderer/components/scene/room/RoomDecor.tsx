@@ -133,7 +133,7 @@ export const RoomDecor: React.FC = () => (
       ))}
     </g>
 
-    {/* ===== DUST PARTICLES / AMBIENT ===== */}
+    {/* ===== DUST PARTICLES / AMBIENT (doubled + golden motes) ===== */}
     <g className={styles.fireflies}>
       <circle cx="100" cy="60" r="0.8" fill="#ffdd88" opacity="0.3" />
       <circle cx="180" cy="80" r="0.6" fill="#ffdd88" opacity="0.2" />
@@ -141,15 +141,22 @@ export const RoomDecor: React.FC = () => (
       <circle cx="300" cy="100" r="0.5" fill="#ffdd88" opacity="0.2" />
       <circle cx="140" cy="150" r="0.6" fill="#ffdd88" opacity="0.25" />
       <circle cx="320" cy="160" r="0.5" fill="#ffdd88" opacity="0.2" />
+      {/* Additional motes */}
+      <circle cx="70" cy="75" r="0.5" fill="#ffe8a0" opacity="0.2" />
+      <circle cx="220" cy="65" r="0.7" fill="#ffe8a0" opacity="0.22" />
+      <circle cx="160" cy="120" r="0.5" fill="#ffe8a0" opacity="0.18" />
+      <circle cx="280" cy="140" r="0.6" fill="#ffe8a0" opacity="0.2" />
+      <circle cx="350" cy="90" r="0.5" fill="#ffe8a0" opacity="0.15" />
+      <circle cx="120" cy="200" r="0.6" fill="#ffe8a0" opacity="0.18" />
     </g>
 
-    {/* ===== WARM LIGHT POOLS ===== */}
+    {/* ===== WARM LIGHT POOLS (expanded) ===== */}
     {/* Light pool from left wall sconce */}
-    <circle cx="45" cy="65" r="20" fill="url(#lampPool)" />
+    <circle cx="45" cy="65" r="24" fill="url(#lampPool)" />
     {/* Light pool from right wall sconce */}
-    <circle cx="355" cy="145" r="20" fill="url(#lampPool)" />
-    {/* Fireplace warm glow on floor */}
-    <ellipse cx="200" cy="70" rx="35" ry="15" fill="url(#lampPool)" opacity="0.8" />
+    <circle cx="355" cy="145" r="24" fill="url(#lampPool)" />
+    {/* Fireplace warm glow on floor (expanded) */}
+    <ellipse cx="200" cy="70" rx="40" ry="18" fill="url(#lampPool)" opacity="0.85" />
 
     {/* ===== EXTRA FLOOR ITEMS ===== */}
     {/* Small cushion near bookshelf */}
@@ -163,7 +170,7 @@ export const RoomDecor: React.FC = () => (
     {/* Small rug at kitchen area */}
     <rect x="42" y="85" width="25" height="15" rx="2" fill="#8a7a5a" stroke="#6a5a3a" strokeWidth="0.5" opacity="0.5" />
 
-    {/* Warm ambient overlay */}
-    <rect x="30" y="25" width="340" height="200" fill="#ffaa44" opacity="0.03" />
+    {/* Warm ambient overlay (strengthened) */}
+    <rect x="30" y="25" width="340" height="200" fill="#ffaa44" opacity="0.05" />
   </g>
 );
