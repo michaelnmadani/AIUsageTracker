@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CatHouseScene } from './components/scene/CatHouseScene';
+import { PixiScene } from './components/scene/PixiScene';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { useUsageData } from './hooks/useUsageData';
 import { useClaudeStatus } from './hooks/useClaudeStatus';
@@ -187,7 +187,7 @@ export const App: React.FC = () => {
 
       {/* Cat scene (top ~55%) */}
       <div style={{ height: '55%', flexShrink: 0, overflow: 'hidden' }}>
-        <CatHouseScene activities={catActivities} isActive={isActive} celebrating={celebrating} />
+        <PixiScene activities={catActivities} isActive={isActive} celebrating={celebrating} />
       </div>
 
       {/* Dashboard (bottom ~45%) */}
