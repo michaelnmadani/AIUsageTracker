@@ -19,6 +19,10 @@ export class BackgroundLayer extends Container {
     const base = new Graphics();
     this.addChild(base);
 
+    // Full-coverage base fill (prevents sub-pixel gaps at scaled edges)
+    base.rect(-10, -10, W + 20, H + 20);
+    base.fill(0xd4c4a8);
+
     // === BACK WALL (fills top ~60%) ===
     base.rect(0, 0, W, H * 0.6);
     base.fill(0xd4c4a8);
@@ -110,12 +114,15 @@ export class BackgroundLayer extends Container {
 
     // === BASEBOARD ===
     const baseboard = new Graphics();
-    baseboard.rect(0, H - 8, W, 8);
+    baseboard.rect(-5, H - 8, W + 10, 8);
     baseboard.fill(0x6b5340);
-    baseboard.rect(0, H - 8, W, 1);
+    baseboard.rect(-5, H - 8, W + 10, 1);
     baseboard.fill({ color: 0x8b7355, alpha: 0.3 });
-    baseboard.rect(0, H - 1, W, 1);
+    baseboard.rect(-5, H - 1, W + 10, 1);
     baseboard.fill({ color: 0x000000, alpha: 0.06 });
+    // Extend floor color below baseboard for overflow
+    baseboard.rect(-5, H, W + 10, 10);
+    baseboard.fill(0x6b5340);
     this.addChild(baseboard);
 
     // === DECORATIVE RUG ===

@@ -9,7 +9,7 @@ import { TweenManager } from '../TweenManager';
  */
 export class CharacterLayer extends Container {
   private cats = new Map<CatActivity, CatSprite>();
-  private textures = new Map<CatActivity, Texture>();
+  private textures = new Map<CatActivity, Texture[]>();
   private tweenManager: TweenManager;
 
   constructor(tweenManager: TweenManager) {
@@ -17,8 +17,8 @@ export class CharacterLayer extends Container {
     this.tweenManager = tweenManager;
   }
 
-  /** Set available textures (from SvgRasterizer) */
-  setTextures(textures: Map<CatActivity, Texture>): void {
+  /** Set available frame textures (from SvgRasterizer) */
+  setTextures(textures: Map<CatActivity, Texture[]>): void {
     this.textures = textures;
   }
 
@@ -38,9 +38,9 @@ export class CharacterLayer extends Container {
     // Add new cats
     for (const activity of activities) {
       if (!this.cats.has(activity)) {
-        const texture = this.textures.get(activity);
-        if (texture) {
-          const cat = new CatSprite(activity, texture, this.tweenManager);
+        const frames = this.textures.get(activity);
+        if (frames && frames.length > 0) {
+          const cat = new CatSprite(activity, frames, this.tweenManager);
           this.cats.set(activity, cat);
           this.addChild(cat);
         }

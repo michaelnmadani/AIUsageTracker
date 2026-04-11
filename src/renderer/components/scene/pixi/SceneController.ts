@@ -1,13 +1,13 @@
 import { Application, Container, Graphics, ColorMatrixFilter } from 'pixi.js';
 import type { CatActivity } from '../../../types/usage';
-import { SCENE_WIDTH, SCENE_HEIGHT, SCENE_STATES, STATE_TRANSITION_MS } from './config/SceneConfig';
+import { SCENE_WIDTH, SCENE_HEIGHT, SCENE_STATES, STATE_TRANSITION_MS, CELEBRATION_DURATION_MS } from './config/SceneConfig';
 import { BackgroundLayer } from './layers/BackgroundLayer';
 import { CharacterLayer } from './layers/CharacterLayer';
 import { EffectsLayer } from './layers/EffectsLayer';
 import { CelebrationLayer } from './layers/CelebrationLayer';
 import { LightingLayer } from './layers/LightingLayer';
 import { TweenManager } from './TweenManager';
-import { preloadAllCatTextures, clearTextureCache } from './SvgRasterizer';
+import { preloadAllCatFrameTextures, clearTextureCache } from './SvgRasterizer';
 
 type SceneState = 'idle' | 'active' | 'celebrating';
 
@@ -66,7 +66,7 @@ export class SceneController {
     this.buildStatusIndicator();
 
     // Preload cat textures from SVG
-    const textures = await preloadAllCatTextures(2);
+    const textures = await preloadAllCatFrameTextures(2);
     this.characterLayer.setTextures(textures);
 
     // Start the animation loop

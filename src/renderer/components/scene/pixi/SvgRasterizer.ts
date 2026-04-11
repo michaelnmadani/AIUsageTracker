@@ -927,7 +927,214 @@ const CAT_SVG_DATA: Record<CatActivity, string> = {
   </g>`
 };
 
-/** Pre-rasterize all cat textures. Call at scene init. */
+// === FRAME-BY-FRAME ANIMATION SYSTEM ===
+
+/** Sinusoidal oscillation for smooth animation loops */
+function sinOsc(frame: number, total: number, amplitude: number): number {
+  return amplitude * Math.sin((2 * Math.PI * frame) / total);
+}
+
+/** Wrap a region of SVG content between startMarker and endMarker in a <g transform> */
+function wrapSvgRegion(
+  svg: string,
+  startMarker: string,
+  endMarker: string,
+  transform: string,
+): string {
+  const startIdx = svg.indexOf(startMarker);
+  if (startIdx === -1) return svg;
+  const endIdx = svg.indexOf(endMarker, startIdx);
+  if (endIdx === -1) return svg;
+  const endPos = endIdx + endMarker.length;
+  return `${svg.slice(0, startIdx)}<g transform="${transform}">${svg.slice(startIdx, endPos)}</g>${svg.slice(endPos)}`;
+}
+
+interface AnimRegion {
+  startMarker: string;
+  endMarker: string;
+  getTransform: (frame: number, total: number) => string;
+}
+
+interface CatAnimConfig {
+  frameCount: number;
+  fps: number;
+  regions: AnimRegion[];
+}
+
+const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
+  cooking: {
+    frameCount: 8, fps: 8,
+    regions: [{
+      startMarker: '<line x1="34" y1="56" x2="52"',
+      endMarker: 'rx="5.5" ry="4" fill="url(#furCream)" stroke="#c4a888" stroke-width="0.8"/>',
+      getTransform: (f, n) => `rotate(${sinOsc(f, n, 15).toFixed(1)}, 35, 56)`,
+    }],
+  },
+  reading: {
+    frameCount: 8, fps: 4,
+    regions: [
+      {
+        startMarker: '<g>\n      <rect x="26" y="58"',
+        endMarker: 'stroke="#aa3333" stroke-width="0.3" opacity="0.3"/>\n    </g>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 4).toFixed(1)}, 42, 68)`,
+      },
+      {
+        startMarker: '<ellipse cx="32" cy="60" rx="5.5"',
+        endMarker: 'cx="34" cy="59" r="0.8" fill="#d8a898" opacity="0.5"/>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 4).toFixed(1)}, 42, 68)`,
+      },
+    ],
+  },
+  sweeping: {
+    frameCount: 8, fps: 10,
+    regions: [
+      {
+        startMarker: '<g>\n      <circle cx="54" cy="78"',
+        endMarker: 'fill="#6d5030" stroke="#5a4020" stroke-width="0.3"/>\n    </g>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 8).toFixed(1)}, 42, 42)`,
+      },
+      {
+        startMarker: '<ellipse cx="40" cy="52" rx="5.5"',
+        endMarker: 'cx="42" cy="51" r="0.8" fill="#e8b0a0" opacity="0.5"/>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 8).toFixed(1)}, 42, 42)`,
+      },
+    ],
+  },
+  sleeping: {
+    frameCount: 6, fps: 3,
+    regions: [{
+      startMarker: '<g>\n      <circle cx="44" cy="34"',
+      endMarker: 'font-family="serif">Z</text>\n    </g>',
+      getTransform: (f, n) => `translate(${sinOsc(f, n, 2).toFixed(1)}, ${sinOsc(f, n, 3).toFixed(1)})`,
+    }],
+  },
+  typing: {
+    frameCount: 8, fps: 10,
+    regions: [
+      {
+        startMarker: '<ellipse cx="30" cy="62" rx="5.5"',
+        endMarker: 'cx="32.5" cy="61" r="0.7" fill="#d8a898" opacity="0.5"/>',
+        getTransform: (f, n) => `translate(0, ${sinOsc(f, n, 3).toFixed(1)})`,
+      },
+      {
+        startMarker: '<ellipse cx="42" cy="62" rx="5.5"',
+        endMarker: 'cx="44" cy="61" r="0.7" fill="#d8a898" opacity="0.5"/>',
+        getTransform: (f, n) => `translate(0, ${sinOsc(f + n / 2, n, 3).toFixed(1)})`,
+      },
+    ],
+  },
+  gardening: {
+    frameCount: 8, fps: 6,
+    regions: [
+      {
+        startMarker: '<g>\n      <rect x="36" y="50"',
+        endMarker: 'opacity="0.6"/>\n      </g>\n    </g>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 12).toFixed(1)}, 42, 55)`,
+      },
+      {
+        startMarker: '<ellipse cx="36" cy="58" rx="5.5"',
+        endMarker: 'cx="38" cy="57" r="0.8" fill="#e8b0a0" opacity="0.5"/>',
+        getTransform: (f, n) => `rotate(${sinOsc(f, n, 5).toFixed(1)}, 36, 58)`,
+      },
+    ],
+  },
+};
+
+/** Generate SVG content for a specific animation frame */
+function generateCatFrame(activity: CatActivity, frameIndex: number): string {
+  const config = CAT_ANIM_CONFIGS[activity];
+  if (!config || config.regions.length === 0) return CAT_SVG_DATA[activity];
+
+  let svg = CAT_SVG_DATA[activity];
+
+  // Process regions right-to-left to avoid index shifts
+  const withPositions = config.regions.map((r) => ({
+    region: r,
+    pos: svg.indexOf(r.startMarker),
+  }));
+  withPositions.sort((a, b) => b.pos - a.pos);
+
+  for (const { region } of withPositions) {
+    const transform = region.getTransform(frameIndex, config.frameCount);
+    svg = wrapSvgRegion(svg, region.startMarker, region.endMarker, transform);
+  }
+
+  return svg;
+}
+
+/** Rasterize a single animation frame to a texture */
+async function rasterizeCatFrame(
+  activity: CatActivity,
+  frameIndex: number,
+  scale: number,
+): Promise<Texture> {
+  const cacheKey = `${activity}_frame${frameIndex}_${scale}`;
+  const cached = textureCache.get(cacheKey);
+  if (cached) return cached;
+
+  const svgContent = generateCatFrame(activity, frameIndex);
+  const svgWidth = 120;
+  const svgHeight = 120;
+  const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth * scale}" height="${svgHeight * scale}" viewBox="-15 0 ${svgWidth} ${svgHeight}">${SHARED_DEFS}${svgContent}</svg>`;
+
+  try {
+    const blob = new Blob([fullSvg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = url;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = svgWidth * scale;
+    canvas.height = svgHeight * scale;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const texture = Texture.from(canvas);
+    textureCache.set(cacheKey, texture);
+    return texture;
+  } catch {
+    return createPlaceholderTexture(activity);
+  }
+}
+
+/** Get the animation FPS for a cat activity */
+export function getCatAnimFps(activity: CatActivity): number {
+  return CAT_ANIM_CONFIGS[activity]?.fps ?? 8;
+}
+
+/** Preload all frame textures for all cats */
+export async function preloadAllCatFrameTextures(
+  scale = 2,
+): Promise<Map<CatActivity, Texture[]>> {
+  const activities: CatActivity[] = ['cooking', 'reading', 'sweeping', 'sleeping', 'typing', 'gardening'];
+  const map = new Map<CatActivity, Texture[]>();
+
+  await Promise.all(
+    activities.map(async (activity) => {
+      const config = CAT_ANIM_CONFIGS[activity];
+      const frameCount = config?.frameCount ?? 1;
+      const frames: Texture[] = [];
+
+      for (let i = 0; i < frameCount; i++) {
+        const texture = await rasterizeCatFrame(activity, i, scale);
+        frames.push(texture);
+      }
+
+      map.set(activity, frames);
+    }),
+  );
+
+  return map;
+}
+
+/** Pre-rasterize all cat textures (single frame). Call at scene init. */
 export async function preloadAllCatTextures(scale = 2): Promise<Map<CatActivity, Texture>> {
   const activities: CatActivity[] = ['cooking', 'reading', 'sweeping', 'sleeping', 'typing', 'gardening'];
   const map = new Map<CatActivity, Texture>();
