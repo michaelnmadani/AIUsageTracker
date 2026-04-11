@@ -9,12 +9,12 @@ export const SCENE_BG = 0x2a3a2a;
 
 /** Cat positions within the scene (reused from CatHouseScene) */
 export const CAT_POSITIONS: Record<CatActivity, { x: number; y: number; scale: number }> = {
-  cooking:   { x: 40,  y: 30,  scale: 0.275 },
-  typing:    { x: 275, y: 25,  scale: 0.265 },
-  reading:   { x: 265, y: 100, scale: 0.275 },
-  sweeping:  { x: 150, y: 100, scale: 0.265 },
-  sleeping:  { x: 275, y: 170, scale: 0.25 },
-  gardening: { x: 40,  y: 170, scale: 0.275 },
+  cooking:   { x: 30,  y: 15,  scale: 0.41 },
+  typing:    { x: 260, y: 10,  scale: 0.40 },
+  reading:   { x: 250, y: 85,  scale: 0.41 },
+  sweeping:  { x: 140, y: 85,  scale: 0.40 },
+  sleeping:  { x: 260, y: 155, scale: 0.375 },
+  gardening: { x: 30,  y: 155, scale: 0.41 },
 };
 
 /** Cat bob animation periods (seconds) — from CSS catBob / sleepBreathe */

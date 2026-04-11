@@ -963,7 +963,7 @@ interface CatAnimConfig {
 
 const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
   cooking: {
-    frameCount: 8, fps: 8,
+    frameCount: 20, fps: 10,
     regions: [{
       startMarker: '<line x1="34" y1="56" x2="52"',
       endMarker: 'rx="5.5" ry="4" fill="url(#furCream)" stroke="#c4a888" stroke-width="0.8"/>',
@@ -971,7 +971,7 @@ const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
     }],
   },
   reading: {
-    frameCount: 8, fps: 4,
+    frameCount: 20, fps: 6,
     regions: [
       {
         startMarker: '<g>\n      <rect x="26" y="58"',
@@ -986,7 +986,7 @@ const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
     ],
   },
   sweeping: {
-    frameCount: 8, fps: 10,
+    frameCount: 20, fps: 12,
     regions: [
       {
         startMarker: '<g>\n      <circle cx="54" cy="78"',
@@ -1001,7 +1001,7 @@ const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
     ],
   },
   sleeping: {
-    frameCount: 6, fps: 3,
+    frameCount: 20, fps: 4,
     regions: [{
       startMarker: '<g>\n      <circle cx="44" cy="34"',
       endMarker: 'font-family="serif">Z</text>\n    </g>',
@@ -1009,7 +1009,7 @@ const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
     }],
   },
   typing: {
-    frameCount: 8, fps: 10,
+    frameCount: 20, fps: 12,
     regions: [
       {
         startMarker: '<ellipse cx="30" cy="62" rx="5.5"',
@@ -1024,7 +1024,7 @@ const CAT_ANIM_CONFIGS: Record<CatActivity, CatAnimConfig> = {
     ],
   },
   gardening: {
-    frameCount: 8, fps: 6,
+    frameCount: 20, fps: 8,
     regions: [
       {
         startMarker: '<g>\n      <rect x="36" y="50"',

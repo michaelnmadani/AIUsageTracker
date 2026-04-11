@@ -119,6 +119,9 @@ export class SceneController {
   private onTick(): void {
     const deltaMs = this.app.ticker.deltaMS;
 
+    // Ensure stage scale stays correct (handles late container resizes)
+    this.updateStageScale();
+
     // Update tween manager
     this.tweenManager.update();
 
