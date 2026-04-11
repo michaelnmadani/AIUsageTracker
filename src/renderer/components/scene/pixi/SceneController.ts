@@ -78,18 +78,14 @@ export class SceneController {
     this.initialized = true;
   }
 
-  /** Scale the stage so logical 400x250 covers the full canvas (no letterboxing) */
+  /** Scale the stage to stretch-fill the entire canvas */
   private updateStageScale(): void {
     const screenW = this.app.renderer.width / (this.app.renderer.resolution || 1);
     const screenH = this.app.renderer.height / (this.app.renderer.resolution || 1);
-    const scaleX = screenW / SCENE_WIDTH;
-    const scaleY = screenH / SCENE_HEIGHT;
-    // Use max to fill entire container (cover), not min (contain)
-    const scale = Math.max(scaleX, scaleY);
-    this.app.stage.scale.set(scale);
-    // Center the scene (may crop edges if aspect ratios differ)
-    this.app.stage.x = (screenW - SCENE_WIDTH * scale) / 2;
-    this.app.stage.y = (screenH - SCENE_HEIGHT * scale) / 2;
+    // Stretch to fill — independent X/Y scaling ensures no gaps
+    this.app.stage.scale.set(screenW / SCENE_WIDTH, screenH / SCENE_HEIGHT);
+    this.app.stage.x = 0;
+    this.app.stage.y = 0;
   }
 
   private buildStatusIndicator(): void {

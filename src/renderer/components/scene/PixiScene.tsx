@@ -29,7 +29,7 @@ export const PixiScene: React.FC<PixiSceneProps> = ({ activities, isActive, cele
     const setup = async () => {
       const app = new Application();
       await app.init({
-        background: 0x2a3a2a,
+        background: 0xd4c4a8,
         resizeTo: container,
         antialias: true,
         resolution: window.devicePixelRatio || 1,
