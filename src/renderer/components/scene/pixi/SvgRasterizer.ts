@@ -931,7 +931,8 @@ const CAT_SVG_DATA: Record<CatActivity, string> = {
 
 /** Sinusoidal oscillation for smooth animation loops */
 function sinOsc(frame: number, total: number, amplitude: number): number {
-  return amplitude * Math.sin((2 * Math.PI * frame) / total);
+  if (total <= 1) return 0;
+  return amplitude * Math.sin((2 * Math.PI * frame) / (total - 1));
 }
 
 /** Wrap a region of SVG content between startMarker and endMarker in a <g transform> */

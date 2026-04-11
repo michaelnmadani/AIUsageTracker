@@ -130,28 +130,28 @@ export class BackgroundLayer extends Container {
     const rug = new Graphics();
     // Outer ring
     rug.ellipse(W / 2, rugCY, W * 0.22, 22);
-    rug.fill({ color: 0x8b3030, alpha: 0.4 });
+    rug.fill({ color: 0x8b3030, alpha: 0.9 });
     // Middle ring
     rug.ellipse(W / 2, rugCY, W * 0.18, 18);
-    rug.fill({ color: 0xa04040, alpha: 0.35 });
+    rug.fill({ color: 0xa04040, alpha: 0.85 });
     // Pattern border
     for (let angle = 0; angle < 360; angle += 15) {
       const rad = (angle * Math.PI) / 180;
       const dx = Math.cos(rad) * W * 0.19;
       const dy = Math.sin(rad) * 20;
       rug.circle(W / 2 + dx, rugCY + dy, 1.5);
-      rug.fill({ color: 0xd4a040, alpha: 0.3 });
+      rug.fill({ color: 0xd4a040, alpha: 0.8 });
     }
     // Inner area
     rug.ellipse(W / 2, rugCY, W * 0.13, 13);
-    rug.fill({ color: 0xc06050, alpha: 0.25 });
+    rug.fill({ color: 0xc06050, alpha: 0.8 });
     // Center medallion
     rug.ellipse(W / 2, rugCY, 15, 5);
-    rug.fill({ color: 0xd4a040, alpha: 0.2 });
+    rug.fill({ color: 0xd4a040, alpha: 0.85 });
     // Rug fringe edges
     for (let fx = W * 0.28; fx < W * 0.72; fx += 5) {
       rug.rect(fx, rugCY + 21, 1, 2);
-      rug.fill({ color: 0xa04040, alpha: 0.15 });
+      rug.fill({ color: 0xa04040, alpha: 0.7 });
     }
     this.addChild(rug);
 

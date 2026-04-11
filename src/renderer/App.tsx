@@ -35,7 +35,8 @@ export const App: React.FC = () => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
+          position: 'relative',
           padding: '6px 10px',
           WebkitAppRegion: 'drag' as any,
           backgroundColor: 'rgba(0, 0, 0, 0.2)',
@@ -43,7 +44,17 @@ export const App: React.FC = () => {
           flexShrink: 0,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {/* Centered title */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          pointerEvents: 'none',
+        }}>
           {/* Cat icon */}
           <svg width="14" height="14" viewBox="0 0 20 20">
             <circle cx="10" cy="12" r="7" fill="#ff9800" />
@@ -61,6 +72,7 @@ export const App: React.FC = () => {
           style={{
             display: 'flex',
             gap: '4px',
+            alignItems: 'center',
             WebkitAppRegion: 'no-drag' as any,
           }}
         >
@@ -70,6 +82,7 @@ export const App: React.FC = () => {
             style={{
               width: '22px',
               height: '22px',
+              marginTop: '2px',
               borderRadius: '4px',
               display: 'flex',
               alignItems: 'center',
