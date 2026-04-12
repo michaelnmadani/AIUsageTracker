@@ -20,8 +20,8 @@ export class EffectsLayer extends Container {
     this.fireflySystem.startEmitting(
       {
         x: 200,
-        y: 125,
-        spawnRadius: 150,
+        y: 200,
+        spawnRadius: 200,
         vx: 0,
         vy: 0,
         vRandom: 3,

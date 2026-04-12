@@ -2,19 +2,19 @@ import type { CatActivity } from '../../../../types/usage';
 
 /** Logical scene dimensions (matches original SVG viewBox) */
 export const SCENE_WIDTH = 400;
-export const SCENE_HEIGHT = 250;
+export const SCENE_HEIGHT = 400;
 
 /** Scene background color */
 export const SCENE_BG = 0x2a3a2a;
 
 /** Cat positions within the scene (reused from CatHouseScene) */
 export const CAT_POSITIONS: Record<CatActivity, { x: number; y: number; scale: number }> = {
-  cooking:   { x: 30,  y: 15,  scale: 0.41 },
-  typing:    { x: 260, y: 10,  scale: 0.40 },
-  reading:   { x: 250, y: 85,  scale: 0.41 },
-  sweeping:  { x: 140, y: 85,  scale: 0.40 },
-  sleeping:  { x: 260, y: 155, scale: 0.375 },
-  gardening: { x: 30,  y: 155, scale: 0.41 },
+  cooking:   { x: 30,  y: 24,  scale: 0.41 },
+  typing:    { x: 260, y: 16,  scale: 0.40 },
+  reading:   { x: 250, y: 136, scale: 0.41 },
+  sweeping:  { x: 140, y: 136, scale: 0.40 },
+  sleeping:  { x: 260, y: 248, scale: 0.375 },
+  gardening: { x: 30,  y: 248, scale: 0.41 },
 };
 
 /** Cat bob animation periods (seconds) — from CSS catBob / sleepBreathe */

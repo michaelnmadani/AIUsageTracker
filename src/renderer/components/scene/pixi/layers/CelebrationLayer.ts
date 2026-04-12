@@ -57,7 +57,7 @@ export class CelebrationLayer extends Container {
       this.sparkleSystem.burst(
         {
           x: 40 + Math.random() * 320,
-          y: 30 + Math.random() * 180,
+          y: 48 + Math.random() * 304,
           vx: 0,
           vy: -2,
           lifetime: 1500 + Math.random() * 1000,

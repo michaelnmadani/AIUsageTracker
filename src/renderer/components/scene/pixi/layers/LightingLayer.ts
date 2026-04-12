@@ -23,9 +23,9 @@ export class LightingLayer extends Container {
   private buildLights(): void {
     // Fireplace glow
     const fireGlow = new Graphics();
-    fireGlow.ellipse(200, 100, 50, 40);
+    fireGlow.ellipse(200, 160, 50, 64);
     fireGlow.fill({ color: 0xff6622, alpha: 0.04 });
-    fireGlow.ellipse(200, 100, 30, 25);
+    fireGlow.ellipse(200, 160, 30, 40);
     fireGlow.fill({ color: 0xff8844, alpha: 0.06 });
     this.addChild(fireGlow);
 
@@ -33,17 +33,17 @@ export class LightingLayer extends Container {
     const windowLight = new Graphics();
     // Angled light beam from window
     windowLight.poly([
-      60, 40,   // top-left of window
-      110, 40,  // top-right of window
-      140, 200, // bottom-right of beam
-      80, 200,  // bottom-left of beam
+      60, 64,    // top-left of window
+      110, 64,   // top-right of window
+      140, 320,  // bottom-right of beam
+      80, 320,   // bottom-left of beam
     ]);
     windowLight.fill({ color: 0xfff8e0, alpha: 0.02 });
     this.addChild(windowLight);
 
     // Window glow at source
     const windowGlow = new Graphics();
-    windowGlow.ellipse(85, 60, 30, 20);
+    windowGlow.ellipse(85, 96, 30, 32);
     windowGlow.fill({ color: 0xfff8e0, alpha: 0.04 });
     this.addChild(windowGlow);
 
