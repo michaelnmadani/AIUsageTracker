@@ -80,9 +80,10 @@ export class SceneController {
 
   /** Scale the stage to stretch-fill the entire canvas */
   private updateStageScale(): void {
-    const screenW = this.app.renderer.width / (this.app.renderer.resolution || 1);
-    const screenH = this.app.renderer.height / (this.app.renderer.resolution || 1);
-    // Stretch to fill — independent X/Y scaling ensures no gaps
+    // app.screen gives CSS pixel dimensions (resolution-independent)
+    // Do NOT divide by resolution — autoDensity already handles DPR scaling
+    const screenW = this.app.screen.width;
+    const screenH = this.app.screen.height;
     this.app.stage.scale.set(screenW / SCENE_WIDTH, screenH / SCENE_HEIGHT);
     this.app.stage.x = 0;
     this.app.stage.y = 0;
