@@ -78,15 +78,16 @@ export class SceneController {
     this.initialized = true;
   }
 
-  /** Scale the stage to stretch-fill the entire canvas */
+  /** Scale the stage uniformly (no distortion), centered in the canvas */
   private updateStageScale(): void {
-    // app.screen gives CSS pixel dimensions (resolution-independent)
-    // Do NOT divide by resolution — autoDensity already handles DPR scaling
     const screenW = this.app.screen.width;
     const screenH = this.app.screen.height;
-    this.app.stage.scale.set(screenW / SCENE_WIDTH, screenH / SCENE_HEIGHT);
-    this.app.stage.x = 0;
-    this.app.stage.y = 0;
+    // Uniform scale — use the smaller ratio to preserve aspect ratio
+    const scale = Math.min(screenW / SCENE_WIDTH, screenH / SCENE_HEIGHT);
+    this.app.stage.scale.set(scale, scale);
+    // Center the scene within the canvas
+    this.app.stage.x = (screenW - SCENE_WIDTH * scale) / 2;
+    this.app.stage.y = (screenH - SCENE_HEIGHT * scale) / 2;
   }
 
   private buildStatusIndicator(): void {
