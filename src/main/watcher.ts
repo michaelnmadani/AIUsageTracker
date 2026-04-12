@@ -1,20 +1,19 @@
 import { EventEmitter } from 'events';
 import chokidar from 'chokidar';
 import fs from 'fs';
-import path from 'path';
 import { UsageParser } from './parser';
+import { detectClaudeDataSources, buildWatchTargets } from './paths';
 
 export class ClaudeWatcher extends EventEmitter {
-  private claudeDir: string;
   private parser: UsageParser;
   private watcher: chokidar.FSWatcher | null = null;
   private fileSizes: Map<string, number> = new Map();
   private activityTimeout: NodeJS.Timeout | null = null;
   private isActive: boolean = false;
+  private apiPollInterval: NodeJS.Timeout | null = null;
 
-  constructor(claudeDir: string, parser: UsageParser) {
+  constructor(parser: UsageParser) {
     super();
-    this.claudeDir = claudeDir;
     this.parser = parser;
   }
 
@@ -22,34 +21,29 @@ export class ClaudeWatcher extends EventEmitter {
     // Initial parse of all existing data
     this.parser.parseAll();
 
-    const projectsDir = path.join(this.claudeDir, 'projects');
-    const sessionsDir = path.join(this.claudeDir, 'sessions');
+    // Build watch targets from all detected sources
+    const sources = detectClaudeDataSources();
+    const targets = buildWatchTargets(sources);
 
-    // Also watch Claude Desktop agent mode sessions on macOS
-    const os = require('os');
-    const claudeDesktopAgentDir = path.join(
-      os.homedir(),
-      'Library',
-      'Application Support',
-      'Claude',
-      'local-agent-mode-sessions'
-    );
-
-    const watchPaths = [
-      `${projectsDir}/**/*.jsonl`,
-      `${sessionsDir}/*.json`,
-    ];
-
-    // Add Claude Desktop path if it exists
-    const fs = require('fs');
-    if (fs.existsSync(claudeDesktopAgentDir)) {
-      watchPaths.push(`${claudeDesktopAgentDir}/**/*.jsonl`);
-      console.log('[Watcher] Also watching Claude Desktop agent dir:', claudeDesktopAgentDir);
+    const allPatterns: string[] = [];
+    for (const target of targets) {
+      console.log(`[Watcher] ${target.label}:`);
+      for (const p of target.patterns) {
+        console.log(`  -> ${p}`);
+        allPatterns.push(p);
+      }
     }
 
-    console.log('[Watcher] Watching paths:', watchPaths);
+    if (allPatterns.length === 0) {
+      console.warn('[Watcher] No watch targets found! No Claude data directories detected.');
+      // Still emit initial state
+      this.emitFullUpdate();
+      return;
+    }
 
-    this.watcher = chokidar.watch(watchPaths, {
+    console.log('[Watcher] Watching', allPatterns.length, 'patterns');
+
+    this.watcher = chokidar.watch(allPatterns, {
       persistent: true,
       ignoreInitial: true,
       followSymlinks: true,
@@ -63,16 +57,41 @@ export class ClaudeWatcher extends EventEmitter {
     this.watcher.on('change', (filePath) => this.handleFileChange(filePath));
 
     // Emit initial state
-    this.emit('usage-update', {
-      current: this.parser.getCurrentSession(),
-      history: this.parser.getHistoricalUsage(),
-      projects: this.parser.getProjects(),
-      models: this.parser.getModelBreakdown(),
-    });
+    this.emitFullUpdate();
+  }
+
+  /** Start periodic API polling (if API client is configured) */
+  startApiPolling(intervalMinutes: number): void {
+    this.stopApiPolling();
+
+    // Do an initial sync
+    this.syncApi();
+
+    // Then poll at the configured interval
+    this.apiPollInterval = setInterval(() => {
+      this.syncApi();
+    }, intervalMinutes * 60 * 1000);
+
+    console.log('[Watcher] API polling started, interval:', intervalMinutes, 'minutes');
+  }
+
+  stopApiPolling(): void {
+    if (this.apiPollInterval) {
+      clearInterval(this.apiPollInterval);
+      this.apiPollInterval = null;
+    }
+  }
+
+  private async syncApi(): Promise<void> {
+    const result = await this.parser.syncFromApi();
+    if (result.fetched > 0) {
+      this.emitFullUpdate();
+    }
   }
 
   stop(): void {
     this.watcher?.close();
+    this.stopApiPolling();
     if (this.activityTimeout) {
       clearTimeout(this.activityTimeout);
     }
@@ -86,7 +105,6 @@ export class ClaudeWatcher extends EventEmitter {
       this.parser.parseAll();
     }
 
-    // Update activity status
     this.setActive(true);
   }
 
@@ -96,7 +114,6 @@ export class ClaudeWatcher extends EventEmitter {
       const previousSize = this.fileSizes.get(filePath) || 0;
 
       if (stat.size > previousSize) {
-        // Read only new content
         const fd = fs.openSync(filePath, 'r');
         const buffer = Buffer.alloc(stat.size - previousSize);
         fs.readSync(fd, buffer, 0, buffer.length, previousSize);
@@ -122,13 +139,21 @@ export class ClaudeWatcher extends EventEmitter {
     }
   }
 
+  private emitFullUpdate(): void {
+    this.emit('usage-update', {
+      current: this.parser.getCurrentSession(),
+      history: this.parser.getHistoricalUsage(),
+      projects: this.parser.getProjects(),
+      models: this.parser.getModelBreakdown(),
+    });
+  }
+
   private setActive(active: boolean): void {
     if (active !== this.isActive) {
       this.isActive = active;
       this.emit('status-change', { isActive: active });
     }
 
-    // Reset inactivity timer
     if (this.activityTimeout) {
       clearTimeout(this.activityTimeout);
     }
@@ -136,7 +161,7 @@ export class ClaudeWatcher extends EventEmitter {
     if (active) {
       this.activityTimeout = setTimeout(() => {
         this.setActive(false);
-      }, 30000); // 30 seconds of no activity = idle
+      }, 30000);
     }
   }
 }

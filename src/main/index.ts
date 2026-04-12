@@ -2,10 +2,13 @@ import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } from 'electron';
 import path from 'path';
 import { ClaudeWatcher } from './watcher';
 import { UsageParser } from './parser';
+import { AnthropicApiClient } from './api-client';
+import { loadSettings, saveSettings, type AppSettings } from './settings';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let watcher: ClaudeWatcher | null = null;
+let settings: AppSettings;
 const parser = new UsageParser();
 
 function createWindow() {
@@ -32,8 +35,6 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    // In production, __dirname is inside the asar: app.asar/dist-electron/main/
-    // The renderer dist is at app.asar/dist/index.html
     const indexPath = path.join(__dirname, '../../dist/index.html');
     console.log('[AIUsageTracker] Loading:', indexPath);
     mainWindow.loadFile(indexPath);
@@ -82,6 +83,7 @@ function createTray() {
 }
 
 function setupIPC() {
+  // --- Usage data ---
   ipcMain.handle('usage:get-current', async () => {
     return parser.getCurrentSession();
   });
@@ -100,6 +102,10 @@ function setupIPC() {
 
   ipcMain.handle('usage:refresh', async () => {
     parser.parseAll();
+    // Also sync API data if configured
+    if (settings.apiKey) {
+      await parser.syncFromApi();
+    }
     return {
       current: parser.getCurrentSession(),
       history: parser.getHistoricalUsage(),
@@ -108,6 +114,80 @@ function setupIPC() {
     };
   });
 
+  // --- Diagnostics ---
+  ipcMain.handle('usage:get-diagnostics', async () => {
+    return parser.getDiagnostics();
+  });
+
+  // --- Settings ---
+  ipcMain.handle('settings:get', async () => {
+    return {
+      apiKeySet: !!settings.apiKey,
+      apiKeyPreview: settings.apiKey ? maskApiKey(settings.apiKey) : null,
+      customPaths: settings.customPaths,
+      apiPollIntervalMinutes: settings.apiPollIntervalMinutes,
+    };
+  });
+
+  ipcMain.handle('settings:set-api-key', async (_event, apiKey: string | null) => {
+    if (apiKey && apiKey.trim()) {
+      const client = new AnthropicApiClient(apiKey.trim());
+      const validation = await client.validateKey();
+
+      if (!validation.valid) {
+        return { success: false, error: validation.error };
+      }
+
+      settings.apiKey = apiKey.trim();
+      parser.setApiClient(client);
+      saveSettings(settings);
+
+      // Start API polling
+      watcher?.startApiPolling(settings.apiPollIntervalMinutes);
+
+      // Do an immediate sync
+      const syncResult = await parser.syncFromApi();
+
+      // Emit update to renderer
+      mainWindow?.webContents.send('usage:update', {
+        current: parser.getCurrentSession(),
+        history: parser.getHistoricalUsage(),
+        projects: parser.getProjects(),
+        models: parser.getModelBreakdown(),
+      });
+
+      return { success: true, fetched: syncResult.fetched };
+    } else {
+      settings.apiKey = null;
+      parser.setApiClient(null);
+      saveSettings(settings);
+      watcher?.stopApiPolling();
+      return { success: true };
+    }
+  });
+
+  ipcMain.handle('settings:set-custom-paths', async (_event, paths: string[]) => {
+    settings.customPaths = paths;
+    parser.setCustomPaths(paths);
+    saveSettings(settings);
+
+    // Re-parse with new paths
+    parser.parseAll();
+    if (settings.apiKey) {
+      await parser.syncFromApi();
+    }
+
+    mainWindow?.webContents.send('usage:update', {
+      current: parser.getCurrentSession(),
+      history: parser.getHistoricalUsage(),
+      projects: parser.getProjects(),
+      models: parser.getModelBreakdown(),
+    });
+
+    return { success: true };
+  });
+
+  // --- Window controls ---
   ipcMain.handle('window:toggle-always-on-top', async () => {
     const isOnTop = mainWindow?.isAlwaysOnTop();
     mainWindow?.setAlwaysOnTop(!isOnTop);
@@ -123,30 +203,30 @@ function setupIPC() {
   });
 }
 
+function maskApiKey(key: string): string {
+  if (key.length <= 12) return '****';
+  return key.slice(0, 12) + '...' + key.slice(-4);
+}
+
 function startWatching() {
-  const homedir = require('os').homedir();
-  const claudeDir = path.join(homedir, '.claude');
+  console.log('[AIUsageTracker] Starting watcher...');
 
-  console.log('[AIUsageTracker] Home directory:', homedir);
-  console.log('[AIUsageTracker] Watching Claude dir:', claudeDir);
-
-  const fs = require('fs');
-  if (fs.existsSync(claudeDir)) {
-    console.log('[AIUsageTracker] Claude directory exists');
-    try {
-      const contents = fs.readdirSync(claudeDir);
-      console.log('[AIUsageTracker] Contents:', contents);
-    } catch (e: any) {
-      console.error('[AIUsageTracker] Cannot read claude dir:', e.message);
-    }
-  } else {
-    console.warn('[AIUsageTracker] Claude directory NOT found at:', claudeDir);
+  // Apply settings to parser
+  if (settings.customPaths.length > 0) {
+    parser.setCustomPaths(settings.customPaths);
   }
 
-  watcher = new ClaudeWatcher(claudeDir, parser);
+  // Set up API client if key is configured
+  if (settings.apiKey) {
+    const client = new AnthropicApiClient(settings.apiKey);
+    parser.setApiClient(client);
+    console.log('[AIUsageTracker] API key configured, will sync from API');
+  }
+
+  watcher = new ClaudeWatcher(parser);
 
   watcher.on('usage-update', (data) => {
-    console.log('[AIUsageTracker] Usage update - projects:', data.projects?.length, 'models:', data.models?.length);
+    console.log('[AIUsageTracker] Usage update - entries:', data.projects?.length, 'projects');
     mainWindow?.webContents.send('usage:update', data);
   });
 
@@ -156,10 +236,20 @@ function startWatching() {
   });
 
   watcher.start();
+
+  // Start API polling if configured
+  if (settings.apiKey) {
+    watcher.startApiPolling(settings.apiPollIntervalMinutes);
+  }
+
   console.log('[AIUsageTracker] Watcher started');
 }
 
 app.whenReady().then(() => {
+  // Load settings before anything else
+  settings = loadSettings();
+  console.log('[AIUsageTracker] Settings loaded, API key:', settings.apiKey ? 'configured' : 'not set');
+
   createWindow();
   createTray();
   setupIPC();

@@ -4,6 +4,7 @@ import { CurrentSession } from './CurrentSession';
 import { History } from './History';
 import { Projects } from './Projects';
 import { Models } from './Models';
+import { Settings } from './Settings';
 import type {
   CurrentSessionInfo,
   HistoricalUsage,
@@ -26,6 +27,7 @@ const TABS = [
   { id: 'history', label: 'History' },
   { id: 'projects', label: 'Projects' },
   { id: 'models', label: 'Models' },
+  { id: 'settings', label: 'Settings' },
 ];
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -48,6 +50,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
               return <Projects projects={projects} />;
             case 'models':
               return <Models models={models} />;
+            case 'settings':
+              return <Settings />;
             default:
               return null;
           }
