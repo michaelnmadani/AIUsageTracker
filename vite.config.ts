@@ -14,13 +14,27 @@ export default defineConfig({
           build: {
             outDir: path.resolve(__dirname, 'dist-electron/main'),
             rollupOptions: {
-              external: ['electron', 'chokidar', 'path', 'fs', 'os'],
+              external: ['electron', 'chokidar', 'path', 'fs', 'os', 'mqtt'],
             },
           },
         },
       },
       {
         entry: path.resolve(__dirname, 'src/preload/index.ts'),
+        onstart(args) {
+          args.reload();
+        },
+        vite: {
+          build: {
+            outDir: path.resolve(__dirname, 'dist-electron/preload'),
+            rollupOptions: {
+              external: ['electron'],
+            },
+          },
+        },
+      },
+      {
+        entry: path.resolve(__dirname, 'src/preload/bambuPreload.ts'),
         onstart(args) {
           args.reload();
         },
@@ -40,6 +54,12 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'src/renderer/index.html'),
+        bambu: path.resolve(__dirname, 'src/renderer/bambu/index.html'),
+      },
+    },
   },
   resolve: {
     alias: {
