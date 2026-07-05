@@ -75,9 +75,12 @@ export interface DiagnosticInfo {
 }
 
 const MODEL_DISPLAY: Record<string, { name: string; color: string }> = {
-  'claude-opus-4-6': { name: 'Opus 4.6', color: '#9333ea' },
+  'claude-opus-4-8': { name: 'Opus 4.8', color: '#9333ea' },
+  'claude-opus-4-6': { name: 'Opus 4.6', color: '#7c3aed' },
+  'claude-sonnet-5': { name: 'Sonnet 5', color: '#2563eb' },
   'claude-sonnet-4-6': { name: 'Sonnet 4.6', color: '#3b82f6' },
   'claude-haiku-4-5-20251001': { name: 'Haiku 4.5', color: '#22c55e' },
+  'claude-fable-5': { name: 'Fable 5', color: '#f59e0b' },
 };
 
 function getModelDisplay(model: string): { name: string; color: string } {
@@ -141,6 +144,8 @@ export class UsageParser {
       try {
         if (kind === 'claude-code') {
           this.parseClaudeCodeDir(dir);
+        } else if (kind === 'claude-desktop-code-sessions') {
+          this.parseDesktopCodeSessions(dir);
         } else if (kind === 'claude-desktop-agent') {
           this.parseAgentDir(dir);
         } else if (kind === 'claude-desktop') {
@@ -195,6 +200,47 @@ export class UsageParser {
     }
   }
 
+  /**
+   * Parse Claude Code sessions stored inside Claude Desktop app.
+   * Path: ~/Library/Application Support/Claude/claude-code-sessions/<accountId>/<orgId>/
+   * Contains JSONL files with the same format as CLI sessions.
+   */
+  private parseDesktopCodeSessions(dir: string): void {
+    if (!fs.existsSync(dir)) return;
+    console.log('[Parser] Scanning Claude Desktop code sessions:', dir);
+
+    const jsonlFiles = this.findJsonlFilesRecursive(dir);
+    console.log('[Parser] Found', jsonlFiles.length, 'JSONL files in Desktop code sessions');
+
+    // Track which directories we've already parsed to avoid duplication
+    const parsedDirs = new Set<string>();
+
+    for (const filePath of jsonlFiles) {
+      const fileDir = path.dirname(filePath);
+      if (parsedDirs.has(fileDir)) continue;
+      parsedDirs.add(fileDir);
+
+      // Try to derive a project name from the path
+      // Structure: claude-code-sessions/<accountId>/<orgId>/<projectHash>/<sessionId>.jsonl
+      // or may have .claude/projects/<encoded-path>/... nested inside
+      let projectName = 'Claude Desktop';
+      const pathParts = filePath.split(path.sep);
+
+      // Look for encoded project path segments (start with -)
+      for (const part of pathParts) {
+        if (part.startsWith('-') && part.length > 5 && !part.startsWith('-sessions-')) {
+          const decoded = decodeProjectPath(part);
+          if (decoded && decoded !== part) {
+            projectName = decoded;
+            break;
+          }
+        }
+      }
+
+      this.parseJsonlFiles(fileDir, projectName);
+    }
+  }
+
   /** Parse Claude Desktop agent mode sessions */
   private parseAgentDir(dir: string): void {
     if (!fs.existsSync(dir)) return;
@@ -217,17 +263,23 @@ export class UsageParser {
     }
   }
 
-  /** Parse Claude Desktop data directory for any usage data */
+  /** Parse Claude Desktop data directory for any remaining JSONL files not covered by specific parsers */
   private parseDesktopDir(dir: string): void {
     if (!fs.existsSync(dir)) return;
 
-    // Look for any JSONL files that might contain usage info
-    // (agent mode is handled separately, but there may be other data)
     const jsonlFiles = this.findJsonlFilesRecursive(dir, 5);
+    const parsedDirs = new Set<string>();
+
     for (const filePath of jsonlFiles) {
-      // Skip agent mode files (handled by parseAgentDir)
+      // Skip dirs handled by dedicated parsers
       if (filePath.includes('local-agent-mode-sessions')) continue;
-      this.parseJsonlFiles(path.dirname(filePath), 'Claude Desktop');
+      if (filePath.includes('claude-code-sessions')) continue;
+
+      const fileDir = path.dirname(filePath);
+      if (parsedDirs.has(fileDir)) continue;
+      parsedDirs.add(fileDir);
+
+      this.parseJsonlFiles(fileDir, 'Claude Desktop');
     }
   }
 
@@ -554,6 +606,11 @@ export class UsageParser {
           return parts.length > 0 ? decodeProjectPath(parts[0]) : 'unknown';
         }
       }
+    }
+
+    // Check for Claude Desktop code sessions
+    if (filePath.includes('claude-code-sessions')) {
+      return 'Claude Desktop';
     }
 
     // Check for Claude Desktop agent mode

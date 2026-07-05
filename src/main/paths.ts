@@ -5,27 +5,27 @@ import os from 'os';
 /**
  * Cross-platform detection of all Claude data directories.
  * Covers Claude Code (CLI, Desktop, IDE, Web) and Claude Desktop app.
+ *
+ * Key directories:
+ * - ~/.claude/projects/                                  — Claude Code CLI + IDE sessions
+ * - ~/Library/Application Support/Claude/claude-code-sessions/  — Claude Code inside Claude Desktop
+ * - ~/Library/Application Support/Claude/local-agent-mode-sessions/ — Legacy agent mode sessions
  */
 
 export interface ClaudeDataSource {
-  /** Human-readable label */
   label: string;
-  /** Absolute path on disk */
   path: string;
-  /** What kind of data lives here */
-  kind: 'claude-code' | 'claude-desktop-agent' | 'claude-desktop';
-  /** Whether the path actually exists */
+  kind: 'claude-code' | 'claude-desktop-code-sessions' | 'claude-desktop-agent' | 'claude-desktop';
   exists: boolean;
 }
 
-/** Glob patterns to watch within a data source directory */
 export interface WatchTarget {
   label: string;
   patterns: string[];
 }
 
 const HOME = os.homedir();
-const PLATFORM = process.platform; // 'darwin' | 'win32' | 'linux'
+const PLATFORM = process.platform;
 
 function appDataDir(): string {
   switch (PLATFORM) {
@@ -40,78 +40,60 @@ function appDataDir(): string {
   }
 }
 
-/**
- * Return every plausible Claude data directory on this machine.
- * Each entry is tagged with whether it exists on disk.
- */
 export function detectClaudeDataSources(): ClaudeDataSource[] {
   const sources: ClaudeDataSource[] = [];
 
-  // --- Claude Code (CLI + Desktop app + IDE extensions) ---
-  // All share ~/.claude/ as their canonical data directory
+  // 1. Claude Code CLI + IDE extensions: ~/.claude/
   const claudeCodeDir = path.join(HOME, '.claude');
   sources.push({
-    label: 'Claude Code (~/.claude)',
+    label: 'Claude Code CLI (~/.claude)',
     path: claudeCodeDir,
     kind: 'claude-code',
     exists: fs.existsSync(claudeCodeDir),
   });
 
-  // --- Claude Desktop app (regular chat) — agent mode sessions ---
-  // macOS: ~/Library/Application Support/Claude/
-  // Windows: %APPDATA%/Claude/
-  // Linux: ~/.config/Claude/
+  // 2. Claude Desktop app base directory
   const claudeDesktopDir = path.join(appDataDir(), 'Claude');
   sources.push({
-    label: `Claude Desktop (${claudeDesktopDir})`,
+    label: 'Claude Desktop',
     path: claudeDesktopDir,
     kind: 'claude-desktop',
     exists: fs.existsSync(claudeDesktopDir),
   });
 
-  // Agent mode sessions live inside the Desktop dir
+  // 3. Claude Code sessions inside Claude Desktop (the main one users expect!)
+  //    Path: ~/Library/Application Support/Claude/claude-code-sessions/<accountId>/<orgId>/
+  const codeSessionsDir = path.join(claudeDesktopDir, 'claude-code-sessions');
+  sources.push({
+    label: 'Claude Desktop Code Sessions',
+    path: codeSessionsDir,
+    kind: 'claude-desktop-code-sessions',
+    exists: fs.existsSync(codeSessionsDir),
+  });
+
+  // 4. Legacy agent mode sessions
   const agentDir = path.join(claudeDesktopDir, 'local-agent-mode-sessions');
   sources.push({
-    label: `Claude Desktop Agent Mode`,
+    label: 'Claude Desktop Agent Mode (legacy)',
     path: agentDir,
     kind: 'claude-desktop-agent',
     exists: fs.existsSync(agentDir),
   });
 
-  // --- Claude Code Desktop app (standalone Electron) ---
-  // May use its own Application Support dir on some installs
+  // 5. Claude Code standalone Desktop app (separate Electron app)
   const claudeCodeAppDir = path.join(appDataDir(), 'Claude Code');
   if (claudeCodeAppDir !== claudeCodeDir) {
     sources.push({
-      label: `Claude Code App (${claudeCodeAppDir})`,
+      label: 'Claude Code Desktop App',
       path: claudeCodeAppDir,
       kind: 'claude-code',
       exists: fs.existsSync(claudeCodeAppDir),
     });
   }
 
-  // --- Alternate capitalization / naming ---
-  for (const name of ['claude-code', 'claudecode', 'claude_code']) {
-    const altDir = path.join(appDataDir(), name);
-    if (altDir !== claudeCodeDir && !sources.some((s) => s.path === altDir)) {
-      const exists = fs.existsSync(altDir);
-      if (exists) {
-        sources.push({
-          label: `Claude Code (${altDir})`,
-          path: altDir,
-          kind: 'claude-code',
-          exists,
-        });
-      }
-    }
-  }
-
   return sources;
 }
 
-/**
- * Build chokidar watch patterns from the discovered sources.
- */
 export function buildWatchTargets(sources: ClaudeDataSource[]): WatchTarget[] {
   const targets: WatchTarget[] = [];
 
@@ -130,7 +112,6 @@ export function buildWatchTargets(sources: ClaudeDataSource[]): WatchTarget[] {
         if (fs.existsSync(sessionsDir)) {
           patterns.push(`${sessionsDir}/*.json`);
         }
-        // Root-level history
         const historyFile = path.join(source.path, 'history.jsonl');
         if (fs.existsSync(historyFile)) {
           patterns.push(historyFile);
@@ -142,28 +123,29 @@ export function buildWatchTargets(sources: ClaudeDataSource[]): WatchTarget[] {
         break;
       }
 
+      case 'claude-desktop-code-sessions': {
+        // Watch all JSONL files recursively under claude-code-sessions/
+        targets.push({
+          label: source.label,
+          patterns: [`${source.path}/**/*.jsonl`],
+        });
+        break;
+      }
+
       case 'claude-desktop-agent': {
-        if (fs.existsSync(source.path)) {
-          targets.push({
-            label: source.label,
-            patterns: [`${source.path}/**/*.jsonl`],
-          });
-        }
+        targets.push({
+          label: source.label,
+          patterns: [`${source.path}/**/*.jsonl`],
+        });
         break;
       }
 
       case 'claude-desktop': {
-        // Scan for any JSONL files that might contain usage data
+        // Watch root-level JSONL and any new subdirs we haven't explicitly handled
         const patterns: string[] = [];
-        // Agent mode dir handled separately above
-        // Look for any other JSONL files
-        const jsonlInRoot = path.join(source.path, '*.jsonl');
-        patterns.push(jsonlInRoot);
-        // Some versions store conversations.jsonl or similar
-        patterns.push(`${source.path}/**/*.jsonl`);
-        if (patterns.length > 0) {
-          targets.push({ label: source.label, patterns });
-        }
+        const rootJsonl = path.join(source.path, '*.jsonl');
+        patterns.push(rootJsonl);
+        targets.push({ label: source.label, patterns });
         break;
       }
     }
@@ -172,22 +154,12 @@ export function buildWatchTargets(sources: ClaudeDataSource[]): WatchTarget[] {
   return targets;
 }
 
-/**
- * Get all directories that should be scanned for JSONL data on initial parse.
- */
 export function getAllScanDirectories(sources: ClaudeDataSource[]): { dir: string; kind: string; label: string }[] {
   const dirs: { dir: string; kind: string; label: string }[] = [];
 
   for (const source of sources) {
     if (!source.exists) continue;
-
-    if (source.kind === 'claude-code') {
-      dirs.push({ dir: source.path, kind: 'claude-code', label: source.label });
-    } else if (source.kind === 'claude-desktop-agent') {
-      dirs.push({ dir: source.path, kind: 'claude-desktop-agent', label: source.label });
-    } else if (source.kind === 'claude-desktop') {
-      dirs.push({ dir: source.path, kind: 'claude-desktop', label: source.label });
-    }
+    dirs.push({ dir: source.path, kind: source.kind, label: source.label });
   }
 
   return dirs;
