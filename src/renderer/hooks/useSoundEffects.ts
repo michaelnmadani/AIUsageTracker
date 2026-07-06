@@ -23,32 +23,42 @@ export function useSoundEffects(status: ClaudeStatus) {
   useEffect(() => {
     if (!Howl) return;
 
+    // html5: true forces plain <audio> element playback instead of Howler's
+    // default Web Audio API path. Electron loads the packaged app via
+    // file://, and Web Audio's XHR-based fetch is blocked cross-file-origin
+    // there — sounds would silently never load. <audio src> is unaffected.
     sounds.current = {
       ambientPurr: new Howl({
         src: ['sounds/ambient-purr.mp3'],
         loop: true,
         volume: volume * 0.5,
+        html5: true,
       }),
       keyboardClick: new Howl({
         src: ['sounds/keyboard-click.mp3'],
         volume: volume * 0.6,
+        html5: true,
       }),
       pageTurn: new Howl({
         src: ['sounds/page-turn.mp3'],
         volume: volume * 0.4,
+        html5: true,
       }),
       cookingBubble: new Howl({
         src: ['sounds/cooking-bubble.mp3'],
         loop: true,
         volume: volume * 0.3,
+        html5: true,
       }),
       sweep: new Howl({
         src: ['sounds/sweep.mp3'],
         volume: volume * 0.3,
+        html5: true,
       }),
       notification: new Howl({
         src: ['sounds/notification.mp3'],
         volume: volume * 0.5,
+        html5: true,
       }),
     };
 

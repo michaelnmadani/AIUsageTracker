@@ -5,6 +5,12 @@ import { UsageParser } from './parser';
 import { AnthropicApiClient } from './api-client';
 import { loadSettings, saveSettings, type AppSettings } from './settings';
 
+// The scene plays ambient/activity sounds automatically on status changes,
+// not in response to a click — Chromium's default autoplay policy blocks
+// any programmatic play() without a prior user gesture, so every sound
+// would silently fail forever. Must be set before app.whenReady().
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let watcher: ClaudeWatcher | null = null;
