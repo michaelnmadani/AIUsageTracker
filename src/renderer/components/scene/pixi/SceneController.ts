@@ -8,6 +8,7 @@ import { CelebrationLayer } from './layers/CelebrationLayer';
 import { LightingLayer } from './layers/LightingLayer';
 import { TweenManager } from './TweenManager';
 import { preloadAllCatFrameTextures, clearTextureCache } from './SvgRasterizer';
+import { destroyGlowTextures } from './GlowTextures';
 
 type SceneState = 'idle' | 'active' | 'celebrating';
 
@@ -26,7 +27,7 @@ export class SceneController {
   private uiLayer!: Container;
   private colorFilter!: ColorMatrixFilter;
   private currentState: SceneState = 'idle';
-  private stateTransition = { brightness: 0.75, saturate: 0.85, sepia: 0.1 };
+  private stateTransition = { brightness: 0.9, saturate: 0.94, sepia: 0.05 };
   private initialized = false;
 
   constructor(app: Application) {
@@ -128,6 +129,7 @@ export class SceneController {
     this.tweenManager.update();
 
     // Update layers
+    this.backgroundLayer.update(deltaMs);
     this.characterLayer.update(deltaMs);
     this.effectsLayer.update(deltaMs);
     this.celebrationLayer.update(deltaMs);
@@ -214,5 +216,6 @@ export class SceneController {
     this.lightingLayer.destroy();
     this.uiLayer.destroy();
     clearTextureCache();
+    destroyGlowTextures();
   }
 }

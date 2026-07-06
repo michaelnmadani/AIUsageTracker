@@ -132,6 +132,50 @@ const SHARED_DEFS = `
 const textureCache = new Map<string, Texture>();
 
 /**
+ * Rasterize an arbitrary standalone SVG document to a PixiJS Texture.
+ * `width`/`height` are the logical size; `scale` supersamples for crispness.
+ * Returns null if the SVG fails to decode.
+ */
+export async function rasterizeSvg(
+  svg: string,
+  width: number,
+  height: number,
+  scale = 2,
+  cacheKey?: string,
+): Promise<Texture | null> {
+  if (cacheKey) {
+    const cached = textureCache.get(cacheKey);
+    if (cached) return cached;
+  }
+
+  try {
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = url;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+
+    const texture = Texture.from(canvas);
+    if (cacheKey) textureCache.set(cacheKey, texture);
+    return texture;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Rasterize an SVG cat component to a PixiJS Texture.
  * Uses the DOM to render SVG → canvas → texture.
  */

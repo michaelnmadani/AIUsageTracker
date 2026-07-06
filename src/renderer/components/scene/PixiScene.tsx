@@ -19,6 +19,10 @@ export const PixiScene: React.FC<PixiSceneProps> = ({ activities, isActive, cele
   const appRef = useRef<Application | null>(null);
   const prevCelebratingRef = useRef(false);
 
+  // Latest props, so async setup can apply them once the controller is ready
+  const latestPropsRef = useRef({ activities, isActive });
+  latestPropsRef.current = { activities, isActive };
+
   // Initialize PixiJS application
   useEffect(() => {
     if (!containerRef.current) return;
@@ -29,7 +33,7 @@ export const PixiScene: React.FC<PixiSceneProps> = ({ activities, isActive, cele
     const setup = async () => {
       const app = new Application();
       await app.init({
-        background: 0xd4c4a8,
+        background: 0xf3ddba,
         resizeTo: container,
         antialias: true,
         resolution: window.devicePixelRatio || 1,
@@ -56,6 +60,10 @@ export const PixiScene: React.FC<PixiSceneProps> = ({ activities, isActive, cele
       }
 
       controllerRef.current = controller;
+
+      // Apply the props that arrived while the controller was initializing
+      controller.setActivities(latestPropsRef.current.activities);
+      controller.setActiveState(latestPropsRef.current.isActive);
     };
 
     setup();

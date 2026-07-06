@@ -1,9 +1,13 @@
-import { Container, AnimatedSprite, Graphics, Texture } from 'pixi.js';
+import { Container, AnimatedSprite, Sprite, Texture } from 'pixi.js';
 import type { CatActivity } from '../../../types/usage';
 import { CAT_POSITIONS, CAT_BOB_PERIODS, WALK_DURATIONS } from './config/SceneConfig';
 import { WALK_PATHS, interpolateWalkPath } from './WalkPaths';
 import { TweenManager } from './TweenManager';
 import { getCatAnimFps } from './SvgRasterizer';
+import { getGlowTexture } from './GlowTextures';
+
+/** The cat SVG artwork is authored on a 120x120 viewBox */
+const CAT_ART_SIZE = 120;
 
 /**
  * Individual cat display object with frame-by-frame animation.
@@ -13,7 +17,9 @@ import { getCatAnimFps } from './SvgRasterizer';
 export class CatSprite extends Container {
   readonly activity: CatActivity;
   private animSprite: AnimatedSprite;
-  private shadow: Graphics;
+  private shadow: Sprite;
+  private shadowBaseY: number;
+  private spriteScale: number;
   private bobState = { y: 0 };
   private walkElapsed = 0;
   private isWalking = false;
@@ -33,18 +39,28 @@ export class CatSprite extends Container {
     this.baseX = pos.x;
     this.baseY = pos.y;
 
-    // Ground shadow
-    this.shadow = new Graphics();
-    this.shadow.ellipse(0, 0, 18, 5);
-    this.shadow.fill({ color: 0x1a1a1a, alpha: 0.15 });
-    this.shadow.x = 40 * pos.scale;
-    this.shadow.y = 95 * pos.scale;
+    // Normalize so pos.scale is always relative to the 120-unit artwork,
+    // regardless of the supersampling factor the frames were rasterized at.
+    this.spriteScale = (pos.scale * CAT_ART_SIZE) / Math.max(1, frames[0]?.width ?? CAT_ART_SIZE);
+
+    // Soft ground shadow (radial gradient tinted black — clearly visible)
+    const sleeping = activity === 'sleeping';
+    this.shadow = new Sprite(getGlowTexture());
+    this.shadow.anchor.set(0.5);
+    this.shadow.tint = 0x2a180a;
+    this.shadow.alpha = 0.38;
+    this.shadow.width = (sleeping ? 165 : 120) * pos.scale;
+    this.shadow.height = (sleeping ? 40 : 32) * pos.scale;
+    // Body center is ~37 art-units from the texture's left edge; feet at ~96
+    this.shadow.x = (sleeping ? 45 : 37) * pos.scale;
+    this.shadowBaseY = (sleeping ? 88 : 96) * pos.scale;
+    this.shadow.y = this.shadowBaseY;
     this.addChild(this.shadow);
 
     // Animated sprite from pre-rendered SVG frames
     this.animSprite = new AnimatedSprite(frames);
     this.animSprite.anchor.set(0, 0);
-    this.animSprite.scale.set(pos.scale);
+    this.animSprite.scale.set(this.spriteScale);
     this.animSprite.animationSpeed = getCatAnimFps(activity) / 60;
     this.animSprite.loop = true;
     this.animSprite.play();
@@ -66,7 +82,7 @@ export class CatSprite extends Container {
       this.tweenManager.oscillate(breathState, 'scaleY', 1.0, 1.02, period);
       this._breathState = breathState;
     } else {
-      this.tweenManager.oscillate(this.bobState, 'y', 0, -2, period);
+      this.tweenManager.oscillate(this.bobState, 'y', 0, -2.5, period);
     }
   }
 
@@ -84,15 +100,14 @@ export class CatSprite extends Container {
 
   /** Update each frame. deltaMs = milliseconds since last frame. */
   update(deltaMs: number): void {
-    const scale = CAT_POSITIONS[this.activity].scale;
-
-    // Apply bob
+    // Apply bob — shadow shrinks slightly as the cat lifts
     this.animSprite.y = this.bobState.y;
-    this.shadow.y = 95 * scale + this.bobState.y * 0.5;
+    this.shadow.y = this.shadowBaseY + this.bobState.y * 0.3;
+    this.shadow.alpha = 0.38 + this.bobState.y * 0.02;
 
     // Apply breathing for sleeping cat
     if (this._breathState) {
-      this.animSprite.scale.y = scale * this._breathState.scaleY;
+      this.animSprite.scale.y = this.spriteScale * this._breathState.scaleY;
     }
 
     // Walk path
@@ -112,7 +127,7 @@ export class CatSprite extends Container {
 
   /** Get the Y position for z-sorting (lower Y = further back = rendered first) */
   getSortY(): number {
-    return this.y + CAT_POSITIONS[this.activity].scale * 95;
+    return this.y + CAT_POSITIONS[this.activity].scale * 96;
   }
 
   updateFrames(frames: Texture[]): void {

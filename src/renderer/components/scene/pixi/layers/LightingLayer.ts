@@ -1,73 +1,75 @@
-import { Container, Graphics } from 'pixi.js';
-import { SCENE_WIDTH, SCENE_HEIGHT } from '../config/SceneConfig';
+import { Container, Sprite } from 'pixi.js';
+import { SCENE_WIDTH, SCENE_HEIGHT, FIREPLACE, WINDOW_LIGHT, DESK_LAMP, FLOOR_LAMP } from '../config/SceneConfig';
+import { getGlowTexture, getVignetteTexture } from '../GlowTextures';
 import { TweenManager } from '../TweenManager';
 
 /**
- * Volumetric lighting overlay using additive blending.
- * Provides warm ambient glow, fireplace light, and window light shafts.
+ * Lighting overlay built from tinted radial-gradient sprites with additive
+ * blending: fireplace glow (flickering), golden window light, warm lamp
+ * pools, a soft ambient wash, and a gentle vignette.
  */
 export class LightingLayer extends Container {
-  private pulseState = { alpha: 0.8 };
+  private fireGlow: Sprite;
+  private fireCore: Sprite;
+  private lampGlows: Sprite[] = [];
+  // Two overlapping oscillators make the flicker feel organic
+  private flickerSlow = { v: 1 };
+  private flickerFast = { v: 1 };
+  private lampPulse = { v: 1 };
 
   constructor(tweenManager: TweenManager) {
     super();
-    // Use 'add' blend mode for light overlay
-    this.blendMode = 'add' as any;
 
-    this.buildLights();
+    const glow = (x: number, y: number, w: number, h: number, tint: number, alpha: number): Sprite => {
+      const s = new Sprite(getGlowTexture());
+      s.anchor.set(0.5);
+      s.position.set(x, y);
+      s.width = w;
+      s.height = h;
+      s.tint = tint;
+      s.alpha = alpha;
+      s.blendMode = 'add';
+      this.addChild(s);
+      return s;
+    };
 
-    // Pulsing warm glow animation
-    tweenManager.oscillate(this.pulseState, 'alpha', 0.7, 1.0, 4000);
-  }
+    // Warm ambient wash over the whole room
+    glow(SCENE_WIDTH / 2, SCENE_HEIGHT * 0.48, 640, 640, 0xffd9a0, 0.12);
 
-  private buildLights(): void {
-    // Fireplace glow
-    const fireGlow = new Graphics();
-    fireGlow.ellipse(200, 160, 50, 64);
-    fireGlow.fill({ color: 0xff6622, alpha: 0.04 });
-    fireGlow.ellipse(200, 160, 30, 40);
-    fireGlow.fill({ color: 0xff8844, alpha: 0.06 });
-    this.addChild(fireGlow);
+    // Golden hour window light (the angled beam itself is baked, pre-blurred,
+    // into the room art — a runtime polygon would show hard edges)
+    glow(WINDOW_LIGHT.x, WINDOW_LIGHT.y + 4, 230, 200, 0xffe9b0, 0.26);
+    glow(80, 200, 190, 160, 0xffe9b0, 0.12);
 
-    // Window light shaft
-    const windowLight = new Graphics();
-    // Angled light beam from window
-    windowLight.poly([
-      60, 64,    // top-left of window
-      110, 64,   // top-right of window
-      140, 320,  // bottom-right of beam
-      80, 320,   // bottom-left of beam
-    ]);
-    windowLight.fill({ color: 0xfff8e0, alpha: 0.02 });
-    this.addChild(windowLight);
+    // Fireplace glow (flickers in update)
+    this.fireGlow = glow(FIREPLACE.x, FIREPLACE.y + 4, 300, 240, 0xff8c3a, 0.34);
+    this.fireCore = glow(FIREPLACE.x, FIREPLACE.y + 2, 140, 110, 0xffc25e, 0.4);
+    // Warm pool the fire casts on the floor in front of the hearth
+    glow(FIREPLACE.x, 172, 220, 90, 0xff9848, 0.2);
 
-    // Window glow at source
-    const windowGlow = new Graphics();
-    windowGlow.ellipse(85, 96, 30, 32);
-    windowGlow.fill({ color: 0xfff8e0, alpha: 0.04 });
-    this.addChild(windowGlow);
+    // Lamps
+    this.lampGlows.push(glow(DESK_LAMP.x, DESK_LAMP.y, 120, 100, 0xffdf8e, 0.3));
+    this.lampGlows.push(glow(FLOOR_LAMP.x, FLOOR_LAMP.y, 140, 120, 0xffdf8e, 0.28));
 
-    // Ambient warm overlay (full scene)
-    const ambient = new Graphics();
-    ambient.rect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
-    ambient.fill({ color: 0xffddaa, alpha: 0.015 });
-    this.addChild(ambient);
-
-    // Vignette (darker edges)
-    const vignette = new Graphics();
-    // Top edge
-    vignette.rect(0, 0, SCENE_WIDTH, 30);
-    vignette.fill({ color: 0x000000, alpha: 0.03 });
-    // Bottom edge
-    vignette.rect(0, SCENE_HEIGHT - 20, SCENE_WIDTH, 20);
-    vignette.fill({ color: 0x000000, alpha: 0.05 });
-    // Use normal blend for vignette
-    vignette.blendMode = 'normal';
+    // Vignette (normal blend, warm dark edges)
+    const vignette = new Sprite(getVignetteTexture());
+    vignette.position.set(-24, -24);
+    vignette.width = SCENE_WIDTH + 48;
+    vignette.height = SCENE_HEIGHT + 48;
+    vignette.alpha = 0.34;
     this.addChild(vignette);
+
+    tweenManager.oscillate(this.flickerSlow, 'v', 0.82, 1.0, 2700);
+    tweenManager.oscillate(this.flickerFast, 'v', 0.92, 1.0, 640);
+    tweenManager.oscillate(this.lampPulse, 'v', 0.9, 1.0, 3800);
   }
 
   update(_deltaMs: number): void {
-    // Apply pulsing alpha to the whole lighting layer
-    this.alpha = this.pulseState.alpha;
+    const flicker = this.flickerSlow.v * this.flickerFast.v;
+    this.fireGlow.alpha = 0.34 * flicker;
+    this.fireCore.alpha = 0.4 * flicker;
+    for (const lamp of this.lampGlows) {
+      lamp.alpha = 0.3 * this.lampPulse.v;
+    }
   }
 }

@@ -25,12 +25,14 @@ export interface ParticleConfig {
   rotationSpeed?: number;
   /** Scale at end of life (1 = no change) */
   endScale?: number;
-  /** Type of particle visual */
-  type?: 'circle' | 'rect' | 'text';
+  /** Type of particle visual. 'glow' draws a soft halo around a bright core. */
+  type?: 'circle' | 'rect' | 'text' | 'glow';
   /** Text content (for type=text) */
   text?: string;
   /** Text style options */
   textStyle?: Partial<TextStyle>;
+  /** Blend mode for each particle (e.g. 'add' for light effects) */
+  blendMode?: 'normal' | 'add' | 'screen';
 }
 
 interface Particle {
@@ -147,12 +149,24 @@ export class ParticleSystem extends Container {
       display = new Graphics();
       display.rect(-cfg.size / 2, -cfg.size / 2, cfg.size, cfg.size);
       display.fill(cfg.color);
+    } else if (cfg.type === 'glow') {
+      // Bright core with two translucent halo rings for a soft light-mote look
+      display = new Graphics();
+      display.circle(0, 0, cfg.size * 2.6);
+      display.fill({ color: cfg.color, alpha: 0.14 });
+      display.circle(0, 0, cfg.size * 1.55);
+      display.fill({ color: cfg.color, alpha: 0.3 });
+      display.circle(0, 0, cfg.size);
+      display.fill({ color: cfg.color, alpha: 1 });
     } else {
       display = new Graphics();
       display.circle(0, 0, cfg.size);
       display.fill(cfg.color);
     }
 
+    if (cfg.blendMode) {
+      display.blendMode = cfg.blendMode;
+    }
     display.x = cfg.x + ox;
     display.y = cfg.y + oy;
     display.alpha = cfg.alpha ?? 1;

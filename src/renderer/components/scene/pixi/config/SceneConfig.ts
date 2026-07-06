@@ -1,23 +1,37 @@
 import type { CatActivity } from '../../../../types/usage';
 
-/** Logical scene dimensions (matches original SVG viewBox) */
+/** Logical scene dimensions */
 export const SCENE_WIDTH = 400;
 export const SCENE_HEIGHT = 400;
 
-/** Scene background color */
-export const SCENE_BG = 0x2a3a2a;
+/** Scene background color (matches the room wall so letterbox edges blend in) */
+export const SCENE_BG = 0xf3ddba;
 
-/** Cat positions within the scene (reused from CatHouseScene) */
+/** Y where the back wall meets the floor in the room art */
+export const WALL_FLOOR_Y = 150;
+
+/** Landmark positions in the room art, used by lighting + effects */
+export const FIREPLACE = { x: 200, y: 126 };
+export const WINDOW_LIGHT = { x: 62, y: 56 };
+export const DESK_LAMP = { x: 362, y: 92 };
+export const FLOOR_LAMP = { x: 352, y: 176 };
+
+/**
+ * Cat positions within the scene.
+ * `scale` is a multiplier on the 120px SVG art — cats stand ~72-78px tall so
+ * the anime-level SVG detail (irises, whiskers, blush) actually reads.
+ * Anchors are the top-left of the cat texture; feet land at y + 96*scale.
+ */
 export const CAT_POSITIONS: Record<CatActivity, { x: number; y: number; scale: number }> = {
-  cooking:   { x: 30,  y: 24,  scale: 0.41 },
-  typing:    { x: 260, y: 16,  scale: 0.40 },
-  reading:   { x: 250, y: 136, scale: 0.41 },
-  sweeping:  { x: 140, y: 136, scale: 0.40 },
-  sleeping:  { x: 260, y: 248, scale: 0.375 },
-  gardening: { x: 30,  y: 248, scale: 0.41 },
+  cooking:   { x: 12,  y: 88,  scale: 0.66 },  // in front of the kitchen counter
+  typing:    { x: 292, y: 86,  scale: 0.66 },  // at the desk nook
+  reading:   { x: 242, y: 182, scale: 0.66 },  // beside the armchair
+  sweeping:  { x: 134, y: 172, scale: 0.66 },  // open floor near the fireplace
+  sleeping:  { x: 260, y: 268, scale: 0.68 },  // cat bed on the braided mat
+  gardening: { x: 18,  y: 260, scale: 0.68 },  // garden corner by the monstera
 };
 
-/** Cat bob animation periods (seconds) — from CSS catBob / sleepBreathe */
+/** Cat bob animation periods (seconds) */
 export const CAT_BOB_PERIODS: Record<CatActivity, number> = {
   cooking:   3.0,
   reading:   4.0,
@@ -27,7 +41,7 @@ export const CAT_BOB_PERIODS: Record<CatActivity, number> = {
   gardening: 3.5,
 };
 
-/** Walk path durations (seconds) — from CSS walk animation durations */
+/** Walk path durations (seconds) */
 export const WALK_DURATIONS: Record<CatActivity, number> = {
   cooking:   14,
   typing:    16,
@@ -37,21 +51,24 @@ export const WALK_DURATIONS: Record<CatActivity, number> = {
   gardening: 15,
 };
 
-/** Scene state filter settings */
+/**
+ * Scene state filter settings.
+ * Idle stays warm and readable (previously 0.75 brightness washed the scene out).
+ */
 export const SCENE_STATES = {
   active: {
-    brightness: 1.05,
-    saturate: 1.15,
-    sepia: 0.05,
+    brightness: 1.04,
+    saturate: 1.12,
+    sepia: 0.02,
   },
   idle: {
-    brightness: 0.75,
-    saturate: 0.85,
-    sepia: 0.1,
+    brightness: 0.9,
+    saturate: 0.94,
+    sepia: 0.05,
   },
   celebrating: {
-    brightness: 1.15,
-    saturate: 1.3,
+    brightness: 1.12,
+    saturate: 1.28,
     sepia: 0,
   },
 } as const;
@@ -59,19 +76,11 @@ export const SCENE_STATES = {
 /** Transition duration for scene state changes (ms) */
 export const STATE_TRANSITION_MS = 500;
 
-/** Celebration effect duration (ms) — matches CSS celebrationFadeOut */
+/** Celebration effect duration (ms) */
 export const CELEBRATION_DURATION_MS = 3500;
 
-/** Room colors for placeholder background */
+/** Colors used for the pre-texture placeholder fill */
 export const ROOM_COLORS = {
-  outerBg: 0x2a3a2a,
-  grass: 0x4a6e34,
-  floor: 0x8b7355,
-  floorLight: 0xa0896a,
-  wallBack: 0x6b8e6b,
-  wallSide: 0x5a7d5a,
-  ceiling: 0x7a9e7a,
-  wallInner: 0xd4c4a8,
-  windowGlow: 0xfff8e0,
-  fireGlow: 0xff8844,
+  wall: 0xf3ddba,
+  floor: 0xb5814e,
 } as const;
