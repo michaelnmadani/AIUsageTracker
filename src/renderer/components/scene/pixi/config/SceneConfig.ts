@@ -5,16 +5,16 @@ export const SCENE_WIDTH = 400;
 export const SCENE_HEIGHT = 400;
 
 /** Scene background color (matches the room wall so letterbox edges blend in) */
-export const SCENE_BG = 0xf3ddba;
+export const SCENE_BG = 0xdec28f;
 
 /** Y where the back wall meets the floor in the room art */
 export const WALL_FLOOR_Y = 150;
 
 /** Landmark positions in the room art, used by lighting + effects */
 export const FIREPLACE = { x: 200, y: 126 };
-export const WINDOW_LIGHT = { x: 62, y: 56 };
-export const DESK_LAMP = { x: 362, y: 92 };
-export const FLOOR_LAMP = { x: 352, y: 176 };
+export const WINDOW_LIGHT = { x: 62, y: 58 };
+export const DESK_LAMP = { x: 366, y: 92 };
+export const FLOOR_LAMP = { x: 352, y: 177 };
 
 /**
  * Cat positions within the scene.
@@ -81,6 +81,6 @@ export const CELEBRATION_DURATION_MS = 3500;
 
 /** Colors used for the pre-texture placeholder fill */
 export const ROOM_COLORS = {
-  wall: 0xf3ddba,
-  floor: 0xb5814e,
+  wall: 0xdec28f,
+  floor: 0x9c6c3a,
 } as const;

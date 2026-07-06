@@ -34,12 +34,12 @@ export class LightingLayer extends Container {
     };
 
     // Warm ambient wash over the whole room
-    glow(SCENE_WIDTH / 2, SCENE_HEIGHT * 0.48, 640, 640, 0xffd9a0, 0.12);
+    glow(SCENE_WIDTH / 2, SCENE_HEIGHT * 0.48, 640, 640, 0xffc98a, 0.13);
 
     // Golden hour window light (the angled beam itself is baked, pre-blurred,
     // into the room art — a runtime polygon would show hard edges)
-    glow(WINDOW_LIGHT.x, WINDOW_LIGHT.y + 4, 230, 200, 0xffe9b0, 0.26);
-    glow(80, 200, 190, 160, 0xffe9b0, 0.12);
+    glow(WINDOW_LIGHT.x, WINDOW_LIGHT.y + 4, 230, 200, 0xffe2a0, 0.26);
+    glow(80, 200, 190, 160, 0xffe2a0, 0.12);
 
     // Fireplace glow (flickers in update)
     this.fireGlow = glow(FIREPLACE.x, FIREPLACE.y + 4, 300, 240, 0xff8c3a, 0.34);
@@ -47,16 +47,16 @@ export class LightingLayer extends Container {
     // Warm pool the fire casts on the floor in front of the hearth
     glow(FIREPLACE.x, 172, 220, 90, 0xff9848, 0.2);
 
-    // Lamps
-    this.lampGlows.push(glow(DESK_LAMP.x, DESK_LAMP.y, 120, 100, 0xffdf8e, 0.3));
-    this.lampGlows.push(glow(FLOOR_LAMP.x, FLOOR_LAMP.y, 140, 120, 0xffdf8e, 0.28));
+    // Lanterns
+    this.lampGlows.push(glow(DESK_LAMP.x, DESK_LAMP.y, 120, 100, 0xffc668, 0.32));
+    this.lampGlows.push(glow(FLOOR_LAMP.x, FLOOR_LAMP.y, 140, 120, 0xffc668, 0.3));
 
     // Vignette (normal blend, warm dark edges)
     const vignette = new Sprite(getVignetteTexture());
     vignette.position.set(-24, -24);
     vignette.width = SCENE_WIDTH + 48;
     vignette.height = SCENE_HEIGHT + 48;
-    vignette.alpha = 0.34;
+    vignette.alpha = 0.4;
     this.addChild(vignette);
 
     tweenManager.oscillate(this.flickerSlow, 'v', 0.82, 1.0, 2700);
