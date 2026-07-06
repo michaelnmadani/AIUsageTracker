@@ -46,7 +46,14 @@ function createWindow() {
 }
 
 function createTray() {
-  const icon = nativeImage.createEmpty();
+  // 'Template' suffix lets macOS recolor the icon for light/dark menu bars
+  const trayIconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'tray', 'trayTemplate.png')
+    : path.join(__dirname, '../../build/tray/trayTemplate.png');
+  let icon = nativeImage.createFromPath(trayIconPath);
+  if (icon.isEmpty()) {
+    icon = nativeImage.createEmpty();
+  }
   tray = new Tray(icon);
   tray.setToolTip('AI Usage Tracker');
 

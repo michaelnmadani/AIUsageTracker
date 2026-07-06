@@ -6,9 +6,11 @@ directories:
 files:
   - dist/**/*
   - dist-electron/**/*
-  - src/sounds/**/*
   - "!node_modules/**/*.ts"
   - "!node_modules/**/*.map"
+extraResources:
+  - from: build/tray
+    to: tray
 mac:
   target:
     - target: dmg

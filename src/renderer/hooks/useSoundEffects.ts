@@ -1,15 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ClaudeStatus } from '../types/usage';
 
-// Howler will be loaded dynamically
-let Howl: any = null;
-
-try {
-  const howler = require('howler');
-  Howl = howler.Howl;
-} catch {
-  // Howler not available, sounds disabled
-}
+// Bundled by vite — require() is unavailable in the sandboxed renderer
+import { Howl } from 'howler';
 
 interface SoundRefs {
   ambientPurr?: any;
