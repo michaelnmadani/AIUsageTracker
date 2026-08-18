@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { Empty, Panel } from '../components/Panel';
+import { ProgressRing } from '../components/ProgressRing';
 import { compactNumber, duration, money, relativeTime } from '../lib/format';
 import type { ClaudeData, ClaudeModelSlice } from '../../shared/types';
 
@@ -64,6 +65,7 @@ export function ClaudePanel({
     <Panel
       title="Claude usage"
       problem={error}
+      pulse={claude.updatedAt}
       meta={
         <>
           <span className="tag">{PLAN_LABEL[claude.plan] ?? claude.plan}</span>
@@ -97,6 +99,16 @@ export function ClaudePanel({
           <Empty>{subscription.reason}</Empty>
         ) : (
           <>
+            <div className="row" style={{ gap: 16, alignItems: 'center', marginBottom: 10 }}>
+              <ProgressRing
+                size={104}
+                stroke={6}
+                progress={subscription.window.percentUsed}
+                active={subscription.isActive}
+                colour={subscription.window.percentUsed > 85 ? 'var(--amber)' : 'var(--hud)'}
+                sublabel={`${subscription.window.hours}h window`}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
             <div className="claude__stats">
               <div className="stat">
                 <div className="stat__value">{compactNumber(subscription.window.tokens)}</div>
@@ -139,6 +151,8 @@ export function ClaudePanel({
                 : 'No activity in the current window'}
               {subscription.activeProject ? ` · ${subscription.activeProject}` : ''}
             </div>
+              </div>
+            </div>
 
             {chartData.length > 0 ? (
               <div style={{ height: 90, marginTop: 12 }}>
@@ -146,24 +160,25 @@ export function ClaudePanel({
                   <BarChart data={chartData}>
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: '#63708a', fontSize: 10 }}
+                      tick={{ fill: '#4d7188', fontSize: 9, fontFamily: 'var(--mono)' }}
                       axisLine={false}
                       tickLine={false}
                       interval="preserveStartEnd"
                     />
                     <Tooltip
-                      cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                      cursor={{ fill: 'rgba(94,214,255,0.07)' }}
                       contentStyle={{
-                        background: '#141a26',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 10,
-                        fontSize: 12,
+                        background: '#08131f',
+                        border: '1px solid rgba(94,214,255,0.35)',
+                        borderRadius: 3,
+                        fontFamily: 'var(--mono)',
+                        fontSize: 11,
                       }}
                       formatter={(value: number) => [compactNumber(value), 'Tokens']}
                     />
-                    <Bar dataKey="value" radius={[3, 3, 0, 0]}>
+                    <Bar dataKey="value" radius={[1, 1, 0, 0]} animationDuration={700}>
                       {chartData.map((_, index) => (
-                        <Cell key={index} fill="#7c9cff" />
+                        <Cell key={index} fill="#5ed6ff" fillOpacity={0.85} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -220,24 +235,25 @@ export function ClaudePanel({
                 <BarChart data={chartData}>
                   <XAxis
                     dataKey="label"
-                    tick={{ fill: '#63708a', fontSize: 10 }}
+                    tick={{ fill: '#4d7188', fontSize: 9, fontFamily: 'var(--mono)' }}
                     axisLine={false}
                     tickLine={false}
                     interval="preserveStartEnd"
                   />
                   <Tooltip
-                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                    cursor={{ fill: 'rgba(94,214,255,0.07)' }}
                     contentStyle={{
-                      background: '#141a26',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 10,
-                      fontSize: 12,
+                      background: '#08131f',
+                      border: '1px solid rgba(94,214,255,0.35)',
+                      borderRadius: 3,
+                      fontFamily: 'var(--mono)',
+                      fontSize: 11,
                     }}
                     formatter={(value: number) => [money(value), 'Spend']}
                   />
-                  <Bar dataKey="value" radius={[3, 3, 0, 0]}>
+                  <Bar dataKey="value" radius={[1, 1, 0, 0]} animationDuration={700}>
                     {chartData.map((_, index) => (
-                      <Cell key={index} fill="#a877ff" />
+                      <Cell key={index} fill="#ffb547" fillOpacity={0.85} />
                     ))}
                   </Bar>
                 </BarChart>

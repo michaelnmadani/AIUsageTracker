@@ -22,15 +22,15 @@ interface Price {
 }
 
 const PRICING: Record<string, Price> = {
-  'claude-fable-5': { input: 10, output: 50, label: 'Fable 5', colour: '#e0719c' },
-  'claude-mythos-5': { input: 10, output: 50, label: 'Mythos 5', colour: '#c76bd6' },
-  'claude-opus-5': { input: 5, output: 25, label: 'Opus 5', colour: '#a877ff' },
-  'claude-opus-4-8': { input: 5, output: 25, label: 'Opus 4.8', colour: '#9b6bf2' },
-  'claude-opus-4-7': { input: 5, output: 25, label: 'Opus 4.7', colour: '#8f63e6' },
-  'claude-opus-4-6': { input: 5, output: 25, label: 'Opus 4.6', colour: '#845bd9' },
-  'claude-sonnet-5': { input: 3, output: 15, label: 'Sonnet 5', colour: '#5b9bff' },
-  'claude-sonnet-4-6': { input: 3, output: 15, label: 'Sonnet 4.6', colour: '#4f8be6' },
-  'claude-haiku-4-5': { input: 1, output: 5, label: 'Haiku 4.5', colour: '#4bc79a' },
+  'claude-fable-5': { input: 10, output: 50, label: 'Fable 5', colour: '#ff8fb3' },
+  'claude-mythos-5': { input: 10, output: 50, label: 'Mythos 5', colour: '#c78dff' },
+  'claude-opus-5': { input: 5, output: 25, label: 'Opus 5', colour: '#b6efff' },
+  'claude-opus-4-8': { input: 5, output: 25, label: 'Opus 4.8', colour: '#5ed6ff' },
+  'claude-opus-4-7': { input: 5, output: 25, label: 'Opus 4.7', colour: '#3fb6e8' },
+  'claude-opus-4-6': { input: 5, output: 25, label: 'Opus 4.6', colour: '#1c8fc4' },
+  'claude-sonnet-5': { input: 3, output: 15, label: 'Sonnet 5', colour: '#ffb547' },
+  'claude-sonnet-4-6': { input: 3, output: 15, label: 'Sonnet 4.6', colour: '#e09a2e' },
+  'claude-haiku-4-5': { input: 1, output: 5, label: 'Haiku 4.5', colour: '#3fe0a8' },
 };
 
 const FAMILY_FALLBACK: { match: RegExp; price: Price }[] = [
@@ -48,7 +48,7 @@ export function priceFor(model: string): Price {
   if (known) return PRICING[known];
   const family = FAMILY_FALLBACK.find((f) => f.match.test(model));
   if (family) return { ...family.price, label: model };
-  return { input: 3, output: 15, label: model || 'unknown', colour: '#7d8799' };
+  return { input: 3, output: 15, label: model || 'unknown', colour: '#4d7188' };
 }
 
 function costOf(entry: UsageEntry): number {

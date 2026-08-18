@@ -87,6 +87,8 @@ export interface PrintersConfig {
 
 export interface GeneralConfig {
   alwaysOnTop: boolean;
+  /** How the header greeting addresses you. */
+  operatorName: string;
   hiddenPanels: PanelId[];
   clockFormat24h: boolean;
   showSeconds: boolean;

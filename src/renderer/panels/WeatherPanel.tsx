@@ -28,6 +28,7 @@ export function WeatherPanel({
     <Panel
       title="Weather"
       problem={error}
+      pulse={weather.updatedAt}
       meta={<span title={weather.locationName}>{relativeTime(weather.updatedAt)}</span>}
     >
       <div className="weather__now">

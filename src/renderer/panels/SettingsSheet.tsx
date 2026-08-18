@@ -134,6 +134,15 @@ function GeneralTab({
       <div className="card__head">
         <span className="card__title">Window &amp; clock</span>
       </div>
+      <div className="field">
+        <span className="field__label">Address me as</span>
+        <input
+          defaultValue={config.general.operatorName}
+          placeholder="Sir"
+          onBlur={(event) => save({ operatorName: event.target.value })}
+        />
+        <span className="field__hint">Used by the greeting in the header.</span>
+      </div>
       <Toggle
         label="Keep the window above everything else"
         checked={config.general.alwaysOnTop}

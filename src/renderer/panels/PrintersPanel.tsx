@@ -30,6 +30,7 @@ function PrinterCard({ printer }: { printer: PrinterStatus }) {
         <ProgressRing
           progress={isPrinting ? printer.progress : printer.state === 'finished' ? 100 : 0}
           colour={colour}
+          active={printer.state === 'printing'}
           label={isPrinting ? `${Math.round(printer.progress)}%` : printer.stateLabel}
           sublabel={
             isPrinting && printer.totalLayers
@@ -112,6 +113,7 @@ export function PrintersPanel({
     <Panel
       title="3D printers"
       problem={error}
+      pulse={printers.updatedAt}
       meta={
         <>
           <span>

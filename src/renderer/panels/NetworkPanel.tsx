@@ -46,7 +46,7 @@ export function NetworkPanel({ network }: { network: NetworkData | null }) {
       }
     >
       <div className="net__readings">
-        <div className="net__reading">
+        <div className={`net__reading${network.downloadBps > 50_000 ? ' net__reading--active' : ''}`}>
           <div className="stat__label" style={{ color: 'var(--down)' }}>
             ↓ Download
           </div>
@@ -59,7 +59,7 @@ export function NetworkPanel({ network }: { network: NetworkData | null }) {
             {bytes(network.totalDownloadBytes)} this session
           </div>
         </div>
-        <div className="net__reading">
+        <div className={`net__reading${network.uploadBps > 50_000 ? ' net__reading--active' : ''}`}>
           <div className="stat__label" style={{ color: 'var(--up)' }}>
             ↑ Upload
           </div>
@@ -83,17 +83,18 @@ export function NetworkPanel({ network }: { network: NetworkData | null }) {
                 <stop offset="100%" stopColor="#5ec6e6" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="upFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#b48bff" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="#b48bff" stopOpacity={0} />
+                <stop offset="0%" stopColor="#ffb547" stopOpacity={0.45} />
+                <stop offset="100%" stopColor="#ffb547" stopOpacity={0} />
               </linearGradient>
             </defs>
             <YAxis hide domain={[0, 'auto']} />
             <Tooltip
               contentStyle={{
-                background: '#141a26',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 10,
-                fontSize: 12,
+                background: '#08131f',
+                border: '1px solid rgba(94,214,255,0.35)',
+                borderRadius: 3,
+                fontFamily: 'var(--mono)',
+                fontSize: 11,
               }}
               labelFormatter={() => ''}
               formatter={(value: number, name: string) => [
@@ -112,7 +113,7 @@ export function NetworkPanel({ network }: { network: NetworkData | null }) {
             <Area
               type="monotone"
               dataKey="up"
-              stroke="#b48bff"
+              stroke="#ffb547"
               strokeWidth={1.6}
               fill="url(#upFill)"
               isAnimationActive={false}

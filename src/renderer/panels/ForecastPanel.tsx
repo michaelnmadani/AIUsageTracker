@@ -19,7 +19,12 @@ export function ForecastPanel({
   }
 
   return (
-    <Panel title="7-day forecast" problem={error} meta={<span>{weather.locationName}</span>}>
+    <Panel
+      title="7-day forecast"
+      problem={error}
+      pulse={weather.updatedAt}
+      meta={<span>{weather.locationName}</span>}
+    >
       <div className="forecast">
         {weather.forecast.map((day, index) => (
           <div

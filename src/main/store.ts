@@ -10,6 +10,7 @@ const TODOS_FILE = 'todos.json';
 export const DEFAULT_CONFIG: AppConfig = {
   general: {
     alwaysOnTop: false,
+    operatorName: 'Sir',
     hiddenPanels: [],
     clockFormat24h: true,
     showSeconds: true,

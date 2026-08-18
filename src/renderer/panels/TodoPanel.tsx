@@ -42,6 +42,7 @@ export function TodoPanel({ todos, onChange }: Props) {
   return (
     <Panel
       title="To do"
+      pulse={todos.updatedAt}
       meta={
         <>
           <span>

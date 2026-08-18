@@ -44,6 +44,7 @@ export function CalendarPanel({
     <Panel
       title="Upcoming"
       problem={error}
+      pulse={calendar.updatedAt}
       meta={
         <>
           {next ? <span>Next {relativeTime(next.start)}</span> : null}
@@ -63,9 +64,7 @@ export function CalendarPanel({
       ) : (
         groupByDay(upcoming).map(([day, events]) => (
           <div key={day} style={{ marginBottom: 12 }}>
-            <div className="stat__label" style={{ marginBottom: 6 }}>
-              {day}
-            </div>
+            <div className="group__label">{day}</div>
             <div className="list">
               {events.map((event) => (
                 <div

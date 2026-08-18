@@ -4,6 +4,9 @@ A desktop command centre for your PC, built with Electron + React. One window th
 answers "what's going on right now": the time, the weather, what's on your plate,
 what your network is doing, what Claude has cost you, and what your printers are up to.
 
+The shell is a J.A.R.V.I.S.-style HUD — arc-reactor cyan on near-black, bracketed
+panels, tracked mono labels, a left rail, a header readout and a bottom dock.
+
 ## Panels
 
 | Panel | Source | Notes |
@@ -20,6 +23,22 @@ what your network is doing, what Claude has cost you, and what your printers are
 
 Every network call happens in the main process. The renderer only talks to the
 preload bridge, with `contextIsolation` on and `nodeIntegration` off.
+
+## Look and motion
+
+The theme lives entirely in `src/renderer/styles/global.css` — one block of tokens
+(`--hud`, `--amber`, `--line`, …) drives every panel, so retinting the whole app is a
+handful of variables.
+
+Motion is deliberately small and cheap: a drifting background grid, a scan bar that
+crosses the window every nine seconds, panels that boot in staggered, a light sweep
+across each card, list rows that cascade, and a head glyph that flares whenever fresh
+telemetry lands on that panel. The Claude dial and printer dials are ticked
+arc-reactor rings whose reticle spins faster while a job is actually running.
+
+Everything animates `transform` and `opacity` only, so the compositor does the work
+rather than the CPU, and the whole motion layer is switched off under
+`prefers-reduced-motion`. No game engine or WebGL involved — plain CSS and inline SVG.
 
 ## Running it
 

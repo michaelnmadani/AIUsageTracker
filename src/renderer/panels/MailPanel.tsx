@@ -34,6 +34,7 @@ export function MailPanel({
     <Panel
       title="Important mail"
       problem={error}
+      pulse={mail.updatedAt}
       meta={
         <>
           <span>{unread} unread in inbox</span>
