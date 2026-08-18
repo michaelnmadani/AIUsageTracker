@@ -60,6 +60,8 @@ const api = {
 
   openExternal: (url: string): Promise<void> => ipcRenderer.invoke('shell:open-external', url),
 
+  relaunch: (): Promise<void> => ipcRenderer.invoke('app:relaunch'),
+
   window: {
     minimize: () => ipcRenderer.invoke('window:minimize'),
     toggleMaximize: (): Promise<boolean> => ipcRenderer.invoke('window:toggle-maximize'),

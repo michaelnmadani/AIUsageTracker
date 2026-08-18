@@ -9,10 +9,11 @@ import type {
   GeocodeResult,
 } from '../../shared/types';
 
-type Tab = 'general' | 'weather' | 'network' | 'google' | 'claude' | 'printers';
+type Tab = 'general' | 'glass' | 'weather' | 'network' | 'google' | 'claude' | 'printers';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'general', label: 'General' },
+  { id: 'glass', label: 'Glass' },
   { id: 'weather', label: 'Weather' },
   { id: 'network', label: 'Network' },
   { id: 'google', label: 'Google' },
@@ -80,6 +81,7 @@ export function SettingsSheet({ config, secrets, onSaveConfig, onSaveSecret, onC
           ) : null}
 
           {tab === 'general' ? <GeneralTab config={config} onSave={onSaveConfig} /> : null}
+          {tab === 'glass' ? <GlassTab config={config} onSave={onSaveConfig} /> : null}
           {tab === 'weather' ? <WeatherTab config={config} onSave={onSaveConfig} /> : null}
           {tab === 'network' ? <NetworkTab config={config} onSave={onSaveConfig} /> : null}
           {tab === 'google' ? (
@@ -157,6 +159,72 @@ function GeneralTab({
         label="Show seconds"
         checked={config.general.showSeconds}
         onChange={(showSeconds) => save({ showSeconds })}
+      />
+    </div>
+  );
+}
+
+function GlassTab({
+  config,
+  onSave,
+}: {
+  config: AppConfig;
+  onSave: (patch: Partial<AppConfig>) => Promise<void>;
+}) {
+  const save = (patch: Partial<AppConfig['general']>) =>
+    void onSave({ general: { ...config.general, ...patch } });
+  const [pendingRestart, setPendingRestart] = useState(false);
+
+  return (
+    <div className="card">
+      <div className="card__head">
+        <span className="card__title">See-through window</span>
+      </div>
+
+      <Toggle
+        label="Let the desktop show through the app"
+        checked={config.general.transparentWindow}
+        onChange={(transparentWindow) => {
+          save({ transparentWindow });
+          setPendingRestart(true);
+        }}
+      />
+      <div className="field__hint" style={{ marginBottom: 12 }}>
+        The window has to be created transparent, so this one takes effect on the next
+        launch. Transparent windows are frameless — drag the header or the left rail to
+        move the window.
+      </div>
+      {pendingRestart ? (
+        <button
+          className="btn btn--primary"
+          style={{ marginBottom: 14 }}
+          onClick={() => void api.relaunch()}
+        >
+          Restart now
+        </button>
+      ) : null}
+
+      <div className="field">
+        <span className="field__label">
+          Panel opacity — {Math.round(config.general.glassOpacity * 100)}%
+        </span>
+        <input
+          type="range"
+          min={5}
+          max={95}
+          value={Math.round(config.general.glassOpacity * 100)}
+          onChange={(event) => save({ glassOpacity: Number(event.target.value) / 100 })}
+        />
+        <span className="field__hint">
+          Applies live to every panel, the rail and the dock. Lower for more wallpaper,
+          higher if text is getting lost against a busy background.
+        </span>
+      </div>
+
+      <Toggle
+        label="Draw the HUD grid over the desktop"
+        checked={config.general.showGridOverlay}
+        onChange={(showGridOverlay) => save({ showGridOverlay })}
       />
     </div>
   );

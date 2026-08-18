@@ -90,7 +90,7 @@ export function NetworkPanel({ network }: { network: NetworkData | null }) {
             <YAxis hide domain={[0, 'auto']} />
             <Tooltip
               contentStyle={{
-                background: '#08131f',
+                background: 'rgba(8, 19, 31, 0.9)',
                 border: '1px solid rgba(94,214,255,0.35)',
                 borderRadius: 3,
                 fontFamily: 'var(--mono)',

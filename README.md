@@ -24,11 +24,29 @@ panels, tracked mono labels, a left rail, a header readout and a bottom dock.
 Every network call happens in the main process. The renderer only talks to the
 preload bridge, with `contextIsolation` on and `nodeIntegration` off.
 
+## See-through window
+
+The window is frameless and composited straight onto your desktop — panels, the rail
+and the dock are all alpha fills, so the wallpaper reads through the whole app.
+
+* **Settings → Glass** has the controls: a see-through toggle, a live **panel opacity**
+  slider (5–95%), and a switch for the HUD grid drawn over the desktop.
+* Transparency is fixed when the window is created, so toggling it offers a restart.
+  Opacity and the grid apply immediately.
+* Frameless means no title bar: drag the header or the left rail to move the window.
+  The header and dock carry their own scrim so the clock and buttons stay readable over
+  a bright wallpaper.
+* Platform notes: Electron documents transparent windows as not reliably resizable, so
+  if dragging an edge misbehaves, turn transparency off in Settings → Glass. On Linux a
+  compositing window manager is required, otherwise the transparent areas paint black.
+  Clicks are not passed through to whatever is behind the window.
+
 ## Look and motion
 
 The theme lives entirely in `src/renderer/styles/global.css` — one block of tokens
-(`--hud`, `--amber`, `--line`, …) drives every panel, so retinting the whole app is a
-handful of variables.
+(`--hud`, `--amber`, `--line`, `--glass`, …) drives every panel, so retinting the whole
+app is a handful of variables. `--glass` is the fill alpha every surface shares, which
+is what the opacity slider writes at runtime.
 
 Motion is deliberately small and cheap: a drifting background grid, a scan bar that
 crosses the window every nine seconds, panels that boot in staggered, a light sweep

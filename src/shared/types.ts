@@ -89,6 +89,12 @@ export interface GeneralConfig {
   alwaysOnTop: boolean;
   /** How the header greeting addresses you. */
   operatorName: string;
+  /** Frameless see-through window so the desktop shows through. Applied at launch. */
+  transparentWindow: boolean;
+  /** Alpha of every panel fill, 0.05 (barely there) to 0.95 (near solid). */
+  glassOpacity: number;
+  /** The faint engineering grid drawn over the desktop. */
+  showGridOverlay: boolean;
   hiddenPanels: PanelId[];
   clockFormat24h: boolean;
   showSeconds: boolean;

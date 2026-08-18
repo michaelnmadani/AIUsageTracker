@@ -11,6 +11,9 @@ export const DEFAULT_CONFIG: AppConfig = {
   general: {
     alwaysOnTop: false,
     operatorName: 'Sir',
+    transparentWindow: true,
+    glassOpacity: 0.44,
+    showGridOverlay: true,
     hiddenPanels: [],
     clockFormat24h: true,
     showSeconds: true,

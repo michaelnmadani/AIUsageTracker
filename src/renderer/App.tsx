@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDashboard } from './hooks/useDashboard';
 import { api } from './lib/api';
 import { HeaderClock } from './components/HeaderClock';
@@ -47,6 +47,18 @@ export function App() {
   const [section, setSection] = useState('top');
 
   const { config, data } = dashboard;
+  const glass = config?.general.glassOpacity;
+  const gridOverlay = config?.general.showGridOverlay;
+
+  // The theme reads --glass for every surface fill, so the slider is a one-liner.
+  useEffect(() => {
+    if (glass === undefined) return;
+    document.documentElement.style.setProperty('--glass', String(glass));
+  }, [glass]);
+
+  useEffect(() => {
+    document.body.classList.toggle('no-grid', gridOverlay === false);
+  }, [gridOverlay]);
 
   const jumpTo = (id: string) => {
     setSection(id);

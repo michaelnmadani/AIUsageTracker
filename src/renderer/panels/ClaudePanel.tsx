@@ -168,7 +168,7 @@ export function ClaudePanel({
                     <Tooltip
                       cursor={{ fill: 'rgba(94,214,255,0.07)' }}
                       contentStyle={{
-                        background: '#08131f',
+                        background: 'rgba(8, 19, 31, 0.9)',
                         border: '1px solid rgba(94,214,255,0.35)',
                         borderRadius: 3,
                         fontFamily: 'var(--mono)',
@@ -243,7 +243,7 @@ export function ClaudePanel({
                   <Tooltip
                     cursor={{ fill: 'rgba(94,214,255,0.07)' }}
                     contentStyle={{
-                      background: '#08131f',
+                      background: 'rgba(8, 19, 31, 0.9)',
                       border: '1px solid rgba(94,214,255,0.35)',
                       borderRadius: 3,
                       fontFamily: 'var(--mono)',

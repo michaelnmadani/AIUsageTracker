@@ -11,12 +11,18 @@ let tray: Tray | null = null;
 let hub: Hub | null = null;
 
 function createWindow(config: AppConfig): BrowserWindow {
+  const seeThrough = config.general.transparentWindow;
   const window = new BrowserWindow({
     width: 1440,
     height: 940,
     minWidth: 960,
     minHeight: 640,
-    backgroundColor: '#0b0e14',
+    // A see-through window has to be frameless, and its own background has to be
+    // fully clear or the OS composites an opaque sheet behind the page.
+    frame: false,
+    transparent: seeThrough,
+    backgroundColor: seeThrough ? '#00000000' : '#03060c',
+    hasShadow: !seeThrough,
     show: false,
     autoHideMenuBar: true,
     title: 'Command Centre',
@@ -165,6 +171,12 @@ function registerIpc(activeHub: Hub): void {
 
   ipcMain.handle('shell:open-external', (_event, url: string) => {
     if (/^https?:\/\//i.test(url)) void shell.openExternal(url);
+  });
+
+  // Transparency is fixed at window creation, so changing it restarts the app.
+  ipcMain.handle('app:relaunch', () => {
+    app.relaunch();
+    app.exit(0);
   });
 
   ipcMain.handle('window:minimize', () => mainWindow?.minimize());
