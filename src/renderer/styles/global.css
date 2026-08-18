@@ -6,13 +6,16 @@
 :root {
   --void: #03060c;
   --void-2: #060c16;
-  /* Fill alpha for every glass surface; the settings slider writes this. */
-  --glass: 0.44;
-  --panel: rgba(5, 13, 22, var(--glass));
+  /* Fill alpha for every glass surface; the settings slider writes this.
+     At the default the panels are essentially just outlines. */
+  --glass: 0.1;
+  --panel: rgba(4, 11, 19, var(--glass));
   /* Dropdown popups are drawn by the OS and cannot be see-through. */
   --panel-solid: #08131f;
-  --panel-raised: rgba(6, 15, 26, calc(var(--glass) + 0.5));
-  --ink-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  --panel-raised: rgba(6, 15, 26, 0.93);
+  /* With no panel fill behind it, every glyph needs its own backing. */
+  --ink-shadow: 0 0 3px rgba(0, 0, 0, 0.95), 0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(0, 0, 0, 0.7);
 
   --line: rgba(94, 214, 255, 0.14);
   --line-mid: rgba(94, 214, 255, 0.28);
@@ -56,12 +59,8 @@ body {
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
-  /* Transparent to the desktop — only additive glow is painted on top. */
-  background:
-    radial-gradient(900px 620px at 8% -8%, rgba(28, 143, 196, 0.14) 0%, transparent 60%),
-    radial-gradient(760px 520px at 102% 4%, rgba(94, 214, 255, 0.08) 0%, transparent 58%),
-    radial-gradient(700px 700px at 50% 120%, rgba(255, 181, 71, 0.05) 0%, transparent 60%),
-    transparent;
+  /* Nothing is painted here — the desktop is the background. */
+  background: transparent;
 }
 
 /* Text sits over whatever wallpaper is behind, so it carries its own contrast. */
@@ -161,12 +160,7 @@ select option {
   gap: 10px;
   padding: 14px 0 16px;
   border-right: 1px solid var(--line);
-  background: linear-gradient(
-    180deg,
-    rgba(5, 13, 22, calc(var(--glass) + 0.16)),
-    rgba(3, 7, 13, calc(var(--glass) - 0.06))
-  );
-  backdrop-filter: blur(10px);
+  background: rgba(4, 11, 19, calc(var(--glass) * 0.8));
   -webkit-app-region: drag;
 }
 
@@ -251,13 +245,6 @@ select option {
   gap: 20px;
   padding: 18px 24px 14px;
   -webkit-app-region: drag;
-  /* Keeps the greeting and clock legible over a bright wallpaper. */
-  background: linear-gradient(
-    180deg,
-    rgba(3, 8, 14, 0.66) 0%,
-    rgba(3, 8, 14, 0.28) 62%,
-    transparent 100%
-  );
 }
 
 .hud-head__greeting {
@@ -371,11 +358,10 @@ select option {
   flex-direction: column;
   min-height: 0;
   background:
-    linear-gradient(180deg, rgba(94, 214, 255, 0.06), transparent 42%),
+    linear-gradient(180deg, rgba(94, 214, 255, 0.05), transparent 38%),
     var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  backdrop-filter: blur(11px) saturate(1.15);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -667,7 +653,7 @@ select option {
   padding: 10px 4px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(94, 214, 255, 0.03);
+  background: rgba(4, 11, 19, calc(var(--glass) * 0.6));
   text-align: center;
   transition: all 0.15s ease;
 }
@@ -726,9 +712,9 @@ select option {
   gap: 9px;
   padding: 8px 10px;
   border: 1px solid transparent;
-  border-left: 2px solid rgba(94, 214, 255, 0.25);
+  border-left: 2px solid rgba(94, 214, 255, 0.4);
   border-radius: 0 var(--radius) var(--radius) 0;
-  background: rgba(94, 214, 255, 0.035);
+  background: rgba(4, 11, 19, calc(var(--glass) * 0.6));
   transition: all 0.15s ease;
 }
 
@@ -851,7 +837,7 @@ select option {
   padding: 9px 11px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(94, 214, 255, 0.04);
+  background: rgba(4, 11, 19, calc(var(--glass) * 0.6));
 }
 
 .net__value {
@@ -953,7 +939,7 @@ select option {
   border: 1px solid var(--line);
   border-left: 2px solid var(--line-hot);
   border-radius: 0 var(--radius) var(--radius) 0;
-  background: rgba(94, 214, 255, 0.035);
+  background: rgba(4, 11, 19, calc(var(--glass) * 0.6));
 }
 
 .printer__ring {
@@ -1020,7 +1006,6 @@ select option {
   justify-content: center;
   gap: 8px;
   padding: 10px 24px 16px;
-  background: linear-gradient(0deg, rgba(3, 8, 14, 0.6) 0%, transparent 100%);
 }
 
 .dock__inner {
@@ -1030,8 +1015,7 @@ select option {
   padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(5, 13, 22, calc(var(--glass) + 0.18));
-  backdrop-filter: blur(12px);
+  background: rgba(4, 11, 19, calc(var(--glass) + 0.14));
   box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.45);
 }
 

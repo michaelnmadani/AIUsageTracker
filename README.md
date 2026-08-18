@@ -26,16 +26,19 @@ preload bridge, with `contextIsolation` on and `nodeIntegration` off.
 
 ## See-through window
 
-The window is frameless and composited straight onto your desktop — panels, the rail
-and the dock are all alpha fills, so the wallpaper reads through the whole app.
+The window is frameless and composited straight onto your desktop. Nothing paints an
+opaque background — the body is fully clear, and panels are essentially outlines:
+hairline borders, corner brackets and text, over a 10% fill by default. Legibility
+comes from a dark rim baked into the text itself rather than from a panel behind it.
 
 * **Settings → Glass** has the controls: a see-through toggle, a live **panel opacity**
-  slider (5–95%), and a switch for the HUD grid drawn over the desktop.
+  slider (0–95%), and a switch for the HUD grid drawn over the desktop (off by default).
 * Transparency is fixed when the window is created, so toggling it offers a restart.
   Opacity and the grid apply immediately.
 * Frameless means no title bar: drag the header or the left rail to move the window.
-  The header and dock carry their own scrim so the clock and buttons stay readable over
-  a bright wallpaper.
+* Over a very bright wallpaper the smallest 10px labels get low-contrast. Nudge the
+  opacity slider up — 25–40% keeps most of the wallpaper visible while giving small
+  text something to sit on.
 * Platform notes: Electron documents transparent windows as not reliably resizable, so
   if dragging an edge misbehaves, turn transparency off in Settings → Glass. On Linux a
   compositing window manager is required, otherwise the transparent areas paint black.

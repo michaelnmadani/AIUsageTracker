@@ -210,7 +210,7 @@ function GlassTab({
         </span>
         <input
           type="range"
-          min={5}
+          min={0}
           max={95}
           value={Math.round(config.general.glassOpacity * 100)}
           onChange={(event) => save({ glassOpacity: Number(event.target.value) / 100 })}
