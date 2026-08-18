@@ -1,28 +1,36 @@
-appId: com.aiusagetracker.app
-productName: AI Usage Tracker
+appId: com.commandcentre.app
+productName: Command Centre
 directories:
   output: out
   buildResources: build
 files:
   - dist/**/*
   - dist-electron/**/*
-  - src/sounds/**/*
+  - package.json
   - "!node_modules/**/*.ts"
   - "!node_modules/**/*.map"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  artifactName: "${productName}-${version}-setup.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Command Centre
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+  artifactName: "${productName}-${version}.${ext}"
 mac:
   target:
     - target: dmg
-      arch:
-        - universal
-  category: public.app-category.developer-tools
+      arch: [universal]
+  category: public.app-category.productivity
   artifactName: "${productName}-${version}.${ext}"
-dmg:
-  title: AI Usage Tracker
-  contents:
-    - x: 130
-      y: 220
-    - x: 410
-      y: 220
-      type: link
-      path: /Applications
 asar: true

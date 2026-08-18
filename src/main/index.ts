@@ -1,183 +1,216 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, shell, Tray } from 'electron';
+import crypto from 'crypto';
 import path from 'path';
-import { ClaudeWatcher } from './watcher';
-import { UsageParser } from './parser';
+import { Hub } from './hub';
+import { searchLocations } from './services/weather';
+import { DEFAULT_MAIL_QUERY } from './services/google/gmail';
+import type { AppConfig, DataChannel, GoogleAccountConfig, TodoItem } from '../shared/types';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
-let watcher: ClaudeWatcher | null = null;
-const parser = new UsageParser();
+let hub: Hub | null = null;
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 400,
-    height: 700,
-    minWidth: 350,
-    minHeight: 500,
-    frame: false,
-    transparent: false,
-    resizable: true,
-    alwaysOnTop: false,
-    backgroundColor: '#1a1a2e',
+function createWindow(config: AppConfig): BrowserWindow {
+  const window = new BrowserWindow({
+    width: 1440,
+    height: 940,
+    minWidth: 960,
+    minHeight: 640,
+    backgroundColor: '#0b0e14',
+    show: false,
+    autoHideMenuBar: true,
+    title: 'Command Centre',
+    alwaysOnTop: config.general.alwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
-    titleBarStyle: 'hiddenInset',
-    vibrancy: 'under-window',
-    visualEffectState: 'active',
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    void window.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    // In production, __dirname is inside the asar: app.asar/dist-electron/main/
-    // The renderer dist is at app.asar/dist/index.html
-    const indexPath = path.join(__dirname, '../../dist/index.html');
-    console.log('[AIUsageTracker] Loading:', indexPath);
-    mainWindow.loadFile(indexPath);
+    void window.loadFile(path.join(__dirname, '../../dist/index.html'));
   }
 
-  mainWindow.on('closed', () => {
+  window.once('ready-to-show', () => window.show());
+  window.on('closed', () => {
     mainWindow = null;
   });
+
+  // Keep external links (mail threads, calendar events) in the real browser.
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    void shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  return window;
 }
 
-function createTray() {
-  const icon = nativeImage.createEmpty();
-  tray = new Tray(icon);
-  tray.setToolTip('AI Usage Tracker');
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show/Hide',
-      click: () => {
-        if (mainWindow?.isVisible()) {
-          mainWindow.hide();
-        } else {
-          mainWindow?.show();
-        }
+function createTray(): void {
+  tray = new Tray(nativeImage.createEmpty());
+  tray.setToolTip('Command Centre');
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      { label: 'Show / hide', click: () => toggleWindow() },
+      {
+        label: 'Always on top',
+        type: 'checkbox',
+        checked: hub?.store.getConfig().general.alwaysOnTop ?? false,
+        click: (item) => hub?.updateConfig({ general: { alwaysOnTop: item.checked } as any }),
       },
-    },
-    {
-      label: 'Always on Top',
-      type: 'checkbox',
-      checked: false,
-      click: (menuItem) => {
-        mainWindow?.setAlwaysOnTop(menuItem.checked);
-      },
-    },
-    { type: 'separator' },
-    {
-      label: 'Quit',
-      click: () => app.quit(),
-    },
-  ]);
-
-  tray.setContextMenu(contextMenu);
-  tray.on('click', () => {
-    mainWindow?.isVisible() ? mainWindow.hide() : mainWindow?.show();
-  });
+      { type: 'separator' },
+      { label: 'Refresh everything', click: () => void hub?.refreshAll() },
+      { type: 'separator' },
+      { label: 'Quit', click: () => app.quit() },
+    ])
+  );
+  tray.on('click', toggleWindow);
 }
 
-function setupIPC() {
-  ipcMain.handle('usage:get-current', async () => {
-    return parser.getCurrentSession();
+function toggleWindow(): void {
+  if (!mainWindow) return;
+  if (mainWindow.isVisible()) mainWindow.hide();
+  else mainWindow.show();
+}
+
+function send(channel: string, ...args: unknown[]): void {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, ...args);
+  }
+}
+
+function registerIpc(activeHub: Hub): void {
+  ipcMain.handle('app:bootstrap', () => ({
+    config: activeHub.store.getConfig(),
+    secrets: activeHub.store.getSecretFlags(),
+    data: activeHub.getAll(),
+    errors: activeHub.getErrors(),
+    platform: process.platform,
+    version: app.getVersion(),
+  }));
+
+  ipcMain.handle('config:update', (_event, patch: Partial<AppConfig>) =>
+    activeHub.updateConfig(patch)
+  );
+
+  ipcMain.handle('secret:set', (_event, key: string, value: string) => {
+    activeHub.store.setSecret(key as any, value);
+    if (key === 'anthropicAdminKey') void activeHub.refresh('claude');
+    return activeHub.store.getSecretFlags();
   });
 
-  ipcMain.handle('usage:get-history', async () => {
-    return parser.getHistoricalUsage();
+  ipcMain.handle('data:refresh', async (_event, channel: DataChannel | 'all') => {
+    if (channel === 'all') await activeHub.refreshAll();
+    else await activeHub.refresh(channel);
+    return activeHub.getAll();
   });
 
-  ipcMain.handle('usage:get-projects', async () => {
-    return parser.getProjects();
-  });
+  ipcMain.handle('weather:search', (_event, query: string) => searchLocations(query));
 
-  ipcMain.handle('usage:get-models', async () => {
-    return parser.getModelBreakdown();
-  });
+  ipcMain.handle('network:interfaces', () => activeHub.network.listInterfaces());
+  ipcMain.handle('network:speed-test', () => activeHub.network.runSpeedTest());
 
-  ipcMain.handle('usage:refresh', async () => {
-    parser.parseAll();
-    return {
-      current: parser.getCurrentSession(),
-      history: parser.getHistoricalUsage(),
-      projects: parser.getProjects(),
-      models: parser.getModelBreakdown(),
+  ipcMain.handle('google:connect', async () => {
+    const result = await activeHub.auth.authorise();
+    const config = activeHub.store.getConfig();
+    const existing = config.google.accounts.find((a) => a.email === result.email);
+    const id = existing?.id ?? crypto.randomUUID();
+
+    activeHub.store.setKeyedSecret('googleRefreshTokens', id, result.refreshToken);
+
+    const account: GoogleAccountConfig = existing ?? {
+      id,
+      email: result.email,
+      label: result.email.split('@')[0],
+      mailQuery: DEFAULT_MAIL_QUERY,
+      calendarIds: [],
+      enabled: true,
     };
+    const accounts = existing
+      ? config.google.accounts.map((a) => (a.id === id ? account : a))
+      : [...config.google.accounts, account];
+
+    const updated = activeHub.updateConfig({ google: { ...config.google, accounts } });
+    return { config: updated, email: result.email };
   });
 
-  ipcMain.handle('window:toggle-always-on-top', async () => {
-    const isOnTop = mainWindow?.isAlwaysOnTop();
-    mainWindow?.setAlwaysOnTop(!isOnTop);
-    return !isOnTop;
+  ipcMain.handle('google:disconnect', (_event, accountId: string) => {
+    activeHub.auth.forget(accountId);
+    const config = activeHub.store.getConfig();
+    return activeHub.updateConfig({
+      google: {
+        ...config.google,
+        accounts: config.google.accounts.filter((a) => a.id !== accountId),
+      },
+    });
   });
 
-  ipcMain.handle('window:minimize', async () => {
-    mainWindow?.minimize();
+  ipcMain.handle('printers:set-access-code', (_event, printerId: string, code: string) => {
+    activeHub.store.setKeyedSecret('bambuAccessCodes', printerId, code || null);
+    activeHub.reconnectPrinter(printerId);
+    return true;
   });
 
-  ipcMain.handle('window:close', async () => {
-    mainWindow?.hide();
+  ipcMain.handle('todos:add', (_event, input: Partial<TodoItem> & { title: string }) =>
+    activeHub.addTodo(input)
+  );
+  ipcMain.handle('todos:update', (_event, id: string, patch: Partial<TodoItem>) =>
+    activeHub.updateTodo(id, patch)
+  );
+  ipcMain.handle('todos:remove', (_event, id: string) => activeHub.removeTodo(id));
+  ipcMain.handle('todos:clear-completed', () => activeHub.clearCompletedTodos());
+  ipcMain.handle('todos:reorder', (_event, ids: string[]) => activeHub.reorderTodos(ids));
+
+  ipcMain.handle('shell:open-external', (_event, url: string) => {
+    if (/^https?:\/\//i.test(url)) void shell.openExternal(url);
   });
+
+  ipcMain.handle('window:minimize', () => mainWindow?.minimize());
+  ipcMain.handle('window:toggle-maximize', () => {
+    if (!mainWindow) return false;
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+    else mainWindow.maximize();
+    return mainWindow.isMaximized();
+  });
+  ipcMain.handle('window:close', () => mainWindow?.close());
 }
 
-function startWatching() {
-  const homedir = require('os').homedir();
-  const claudeDir = path.join(homedir, '.claude');
-
-  console.log('[AIUsageTracker] Home directory:', homedir);
-  console.log('[AIUsageTracker] Watching Claude dir:', claudeDir);
-
-  const fs = require('fs');
-  if (fs.existsSync(claudeDir)) {
-    console.log('[AIUsageTracker] Claude directory exists');
-    try {
-      const contents = fs.readdirSync(claudeDir);
-      console.log('[AIUsageTracker] Contents:', contents);
-    } catch (e: any) {
-      console.error('[AIUsageTracker] Cannot read claude dir:', e.message);
+const singleInstance = app.requestSingleInstanceLock();
+if (!singleInstance) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
     }
-  } else {
-    console.warn('[AIUsageTracker] Claude directory NOT found at:', claudeDir);
-  }
-
-  watcher = new ClaudeWatcher(claudeDir, parser);
-
-  watcher.on('usage-update', (data) => {
-    console.log('[AIUsageTracker] Usage update - projects:', data.projects?.length, 'models:', data.models?.length);
-    mainWindow?.webContents.send('usage:update', data);
   });
 
-  watcher.on('status-change', (status) => {
-    console.log('[AIUsageTracker] Status change:', status);
-    mainWindow?.webContents.send('usage:status-change', status);
+  void app.whenReady().then(() => {
+    hub = new Hub();
+    mainWindow = createWindow(hub.store.getConfig());
+
+    hub.on('data', (channel: DataChannel, payload: unknown) => send('data', channel, payload));
+    hub.on('error', (payload: unknown) => send('service-error', payload));
+    hub.on('config', (config: AppConfig) => send('config', config));
+    hub.on('always-on-top', (value: boolean) => mainWindow?.setAlwaysOnTop(value));
+
+    registerIpc(hub);
+    createTray();
+    hub.start();
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0 && hub) {
+        mainWindow = createWindow(hub.store.getConfig());
+      }
+    });
   });
 
-  watcher.start();
-  console.log('[AIUsageTracker] Watcher started');
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+  });
+
+  app.on('before-quit', () => hub?.stop());
 }
-
-app.whenReady().then(() => {
-  createWindow();
-  createTray();
-  setupIPC();
-  startWatching();
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('before-quit', () => {
-  watcher?.stop();
-});

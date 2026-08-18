@@ -511,4 +511,9 @@ export class UsageParser {
   getLastModifiedTime(): number {
     return this.lastParseTime;
   }
+
+  /** Every parsed usage entry, oldest first. */
+  getEntries(): UsageEntry[] {
+    return this.allEntries;
+  }
 }

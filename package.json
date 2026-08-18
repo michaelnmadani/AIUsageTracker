@@ -1,28 +1,32 @@
 {
-  "name": "ai-usage-tracker",
-  "version": "1.0.0",
-  "description": "Animated cats companion app for Claude Code - tracks usage with cute household cats",
+  "name": "pc-command-centre",
+  "version": "2.0.0",
+  "description": "Desktop command centre: clock, weather, todos, network speed, mail, calendar, Claude usage and 3D printer status",
   "main": "dist-electron/main/index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && electron-builder --mac",
-    "build:dir": "vite build && electron-builder --mac --dir",
-    "build:vite": "vite build",
-    "preview": "vite preview",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "package": "vite build && electron-builder",
+    "package:win": "vite build && electron-builder --win",
+    "package:mac": "vite build && electron-builder --mac",
+    "package:linux": "vite build && electron-builder --linux",
+    "package:dir": "vite build && electron-builder --dir",
     "start": "electron .",
     "electron:dev": "vite build && electron ."
   },
   "dependencies": {
     "chokidar": "^3.6.0",
-    "howler": "^2.2.4",
+    "mqtt": "^5.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/howler": "^2.2.12",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",

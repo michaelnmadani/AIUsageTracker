@@ -1,220 +1,146 @@
 import React, { useState } from 'react';
-import { CatHouseScene } from './components/scene/CatHouseScene';
-import { Dashboard } from './components/dashboard/Dashboard';
-import { useUsageData } from './hooks/useUsageData';
-import { useClaudeStatus } from './hooks/useClaudeStatus';
-import { useSoundEffects } from './hooks/useSoundEffects';
+import { useDashboard } from './hooks/useDashboard';
+import { api } from './lib/api';
+import { ClockPanel } from './panels/ClockPanel';
+import { WeatherPanel } from './panels/WeatherPanel';
+import { ForecastPanel } from './panels/ForecastPanel';
+import { TodoPanel } from './panels/TodoPanel';
+import { NetworkPanel } from './panels/NetworkPanel';
+import { MailPanel } from './panels/MailPanel';
+import { CalendarPanel } from './panels/CalendarPanel';
+import { ClaudePanel } from './panels/ClaudePanel';
+import { PrintersPanel } from './panels/PrintersPanel';
+import { SettingsSheet } from './panels/SettingsSheet';
+import type { TodoData } from '../shared/types';
 
-export const App: React.FC = () => {
-  const { current, history, projects, models, loading } = useUsageData();
-  const { status, catActivities, isActive, celebrating } = useClaudeStatus(current);
-  const { muted, volume, setVolume, toggleMute } = useSoundEffects(status);
-  const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+export function App() {
+  const dashboard = useDashboard();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleToggleAlwaysOnTop = async () => {
-    if (window.usageAPI) {
-      const result = await window.usageAPI.toggleAlwaysOnTop();
-      setAlwaysOnTop(result);
+  const { config, data } = dashboard;
+
+  const refreshAll = async () => {
+    setRefreshing(true);
+    try {
+      await dashboard.refresh('all');
+    } finally {
+      setRefreshing(false);
     }
   };
 
-  const handleMinimize = () => window.usageAPI?.minimize();
-  const handleClose = () => window.usageAPI?.close();
+  const setTodos = (todos: TodoData) =>
+    dashboard.setData((current) => ({ ...current, todos }));
+
+  if (!dashboard.ready || !config) {
+    return (
+      <div className="app">
+        <div className="panel__empty">Starting Command Centre…</div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        backgroundColor: '#1a1a2e',
-      }}
-    >
-      {/* Custom title bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '6px 10px',
-          WebkitAppRegion: 'drag' as any,
-          backgroundColor: 'rgba(0, 0, 0, 0.2)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {/* Cat icon */}
-          <svg width="14" height="14" viewBox="0 0 20 20">
-            <circle cx="10" cy="12" r="7" fill="#ff9800" />
-            <polygon points="4,6 2,0 7,4" fill="#ff9800" />
-            <polygon points="16,6 18,0 13,4" fill="#ff9800" />
-            <circle cx="7" cy="11" r="1.5" fill="#424242" />
-            <circle cx="13" cy="11" r="1.5" fill="#424242" />
-          </svg>
-          <span style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8' }}>
-            AI Usage Tracker
-          </span>
+    <div className="app">
+      <header className="topbar">
+        <div className="topbar__brand">
+          Command Centre <span>{config.weather.locationName}</span>
         </div>
-
-        <div
-          style={{
-            display: 'flex',
-            gap: '4px',
-            WebkitAppRegion: 'no-drag' as any,
-          }}
-        >
-          {/* Sound toggle */}
-          <button
-            onClick={toggleMute}
-            style={{
-              width: '22px',
-              height: '22px',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: muted ? '#ef4444' : '#94a3b8',
-              fontSize: '12px',
-            }}
-            title={muted ? 'Unmute' : 'Mute'}
-          >
-            {muted ? (
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                <line x1="23" y1="9" x2="17" y2="15" />
-                <line x1="17" y1="9" x2="23" y2="15" />
-              </svg>
-            ) : (
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-              </svg>
-            )}
+        <div className="topbar__spacer" />
+        <div className="topbar__actions">
+          <button className="btn" onClick={() => void refreshAll()} disabled={refreshing}>
+            {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
-
-          {/* Volume slider */}
-          {!muted && (
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              style={{
-                width: '40px',
-                height: '3px',
-                accentColor: '#f59e0b',
-                cursor: 'pointer',
-              }}
-            />
-          )}
-
-          {/* Pin button */}
-          <button
-            onClick={handleToggleAlwaysOnTop}
-            style={{
-              width: '22px',
-              height: '22px',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: alwaysOnTop ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: alwaysOnTop ? '#f59e0b' : '#64748b',
-              fontSize: '10px',
-            }}
-            title={alwaysOnTop ? 'Unpin' : 'Pin on top'}
-          >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill={alwaysOnTop ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-              <path d="M12 2L12 12" />
-              <path d="M17 5H7L5 12H19L17 5Z" />
-              <path d="M12 12V22" />
-            </svg>
+          <button className="btn" onClick={() => setSettingsOpen(true)}>
+            Settings
           </button>
-
-          {/* Minimize */}
           <button
-            onClick={handleMinimize}
-            style={{
-              width: '22px',
-              height: '22px',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#64748b',
-            }}
+            className="btn btn--icon"
+            title="Minimise"
+            onClick={() => void api.window.minimize()}
           >
-            <svg width="10" height="2" viewBox="0 0 10 2">
-              <rect width="10" height="2" rx="1" fill="currentColor" />
-            </svg>
+            —
           </button>
-
-          {/* Close */}
           <button
-            onClick={handleClose}
-            style={{
-              width: '22px',
-              height: '22px',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#64748b',
-            }}
+            className="btn btn--icon"
+            title="Maximise"
+            onClick={() => void api.window.toggleMaximize()}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10">
-              <line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            ▢
+          </button>
+          <button
+            className="btn btn--icon btn--danger"
+            title="Close"
+            onClick={() => void api.window.close()}
+          >
+            ✕
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Cat scene (top ~55%) */}
-      <div style={{ height: '55%', flexShrink: 0, overflow: 'hidden' }}>
-        <CatHouseScene activities={catActivities} isActive={isActive} celebrating={celebrating} />
-      </div>
-
-      {/* Dashboard (bottom ~45%) */}
-      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        {loading ? (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: '#64748b',
-              fontSize: '12px',
-            }}
-          >
-            Loading usage data...
-          </div>
-        ) : (
-          <Dashboard
-            current={current}
-            history={history}
-            projects={projects}
-            models={models}
-            status={status}
+      <main className="grid">
+        <div className="span-3">
+          <ClockPanel
+            use24h={config.general.clockFormat24h}
+            showSeconds={config.general.showSeconds}
           />
-        )}
-      </div>
+        </div>
+        <div className="span-3">
+          <WeatherPanel weather={data.weather} error={dashboard.errors.weather} />
+        </div>
+        <div className="span-6">
+          <NetworkPanel network={data.network} />
+        </div>
+
+        <div className="span-12">
+          <ForecastPanel weather={data.weather} error={dashboard.errors.weather} />
+        </div>
+
+        <div className="span-4 row-2">
+          <CalendarPanel
+            calendar={data.calendar}
+            error={dashboard.errors.calendar}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        </div>
+        <div className="span-4 row-2">
+          <MailPanel
+            mail={data.mail}
+            error={dashboard.errors.mail}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        </div>
+        <div className="span-4 row-2">
+          <TodoPanel todos={data.todos} onChange={setTodos} />
+        </div>
+
+        <div className="span-7 row-2">
+          <ClaudePanel claude={data.claude} error={dashboard.errors.claude} />
+        </div>
+        <div className="span-5 row-2">
+          <PrintersPanel
+            printers={data.printers}
+            error={dashboard.errors.printers}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        </div>
+      </main>
+
+      {settingsOpen ? (
+        <SettingsSheet
+          config={config}
+          secrets={dashboard.secrets}
+          onSaveConfig={dashboard.saveConfig}
+          onSaveSecret={dashboard.saveSecret}
+          onClose={() => setSettingsOpen(false)}
+        />
+      ) : null}
+
+      {dashboard.lastError ? (
+        <div className="toast" onClick={dashboard.dismissError}>
+          <b>{dashboard.lastError.channel}</b>: {dashboard.lastError.message}
+        </div>
+      ) : null}
     </div>
   );
-};
+}

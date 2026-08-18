@@ -2,7 +2,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import electron from 'vite-plugin-electron';
 import electronRenderer from 'vite-plugin-electron-renderer';
+import { builtinModules } from 'module';
 import path from 'path';
+
+// Anything Node resolves at runtime stays external — Electron's main process
+// loads it from node_modules rather than having it bundled in.
+const external = [
+  'electron',
+  ...builtinModules,
+  ...builtinModules.map((name) => `node:${name}`),
+  'chokidar',
+  'mqtt',
+  'ws',
+];
 
 export default defineConfig({
   plugins: [
@@ -13,9 +25,7 @@ export default defineConfig({
         vite: {
           build: {
             outDir: path.resolve(__dirname, 'dist-electron/main'),
-            rollupOptions: {
-              external: ['electron', 'chokidar', 'path', 'fs', 'os'],
-            },
+            rollupOptions: { external },
           },
         },
       },
@@ -27,9 +37,7 @@ export default defineConfig({
         vite: {
           build: {
             outDir: path.resolve(__dirname, 'dist-electron/preload'),
-            rollupOptions: {
-              external: ['electron'],
-            },
+            rollupOptions: { external: ['electron'] },
           },
         },
       },
